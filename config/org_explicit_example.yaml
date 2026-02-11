@@ -1,0 +1,26 @@
+# Example explicit tree (organigram-style). Use with --config and --suggest-explicit
+# or build your own and load. Use with: python scripts/run_org_cli.py --config config/org_explicit_example.yaml
+use_explicit: true
+explicit:
+  company_name: AutoCorp
+  divisions:
+    - name: Production
+      departments:
+        - name: Body Shop
+          n_teams: 6
+        - name: Paint
+          n_teams: 4
+        - name: Assembly
+          n_teams: 8
+    - name: R&D
+      departments:
+        - name: Vehicle Development
+          n_teams: 6
+        - name: E-Mobility
+          n_teams: 5
+    - name: Sales & Marketing
+      departments:
+        - name: Sales Ops
+          n_teams: 5
+        - name: Marketing
+          n_teams: 4

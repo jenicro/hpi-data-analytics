@@ -1,0 +1,13 @@
+# Example config: counts-based (adjust to match your organigram)
+# Use with: python scripts/run_org_cli.py --config config/org_suggestion.yaml
+use_explicit: false
+counts:
+  n_divisions: 6
+  n_departments_per_division: [8, 6, 10, 5, 4, 6]
+  n_teams_per_department: 5
+  n_employees_per_team: 8
+  company_name: AutoCorp
+  division_name_prefix: Division
+  department_name_prefix: Dept
+  team_name_prefix: Team
+  employee_name_prefix: Employee

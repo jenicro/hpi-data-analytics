@@ -1,0 +1,345 @@
+[
+  {
+    "id": "company_0",
+    "name": "AutoCorp",
+    "level": "company",
+    "parent_id": null,
+    "level_index": 0
+  },
+  {
+    "id": "division_0",
+    "name": "Production",
+    "level": "division",
+    "parent_id": "company_0",
+    "level_index": 0
+  },
+  {
+    "id": "department_0_0",
+    "name": "Body Shop",
+    "level": "department",
+    "parent_id": "division_0",
+    "level_index": 0
+  },
+  {
+    "id": "team_0_0_0",
+    "name": "Team 1",
+    "level": "team",
+    "parent_id": "department_0_0",
+    "level_index": 0
+  },
+  {
+    "id": "team_0_0_1",
+    "name": "Team 2",
+    "level": "team",
+    "parent_id": "department_0_0",
+    "level_index": 1
+  },
+  {
+    "id": "team_0_0_2",
+    "name": "Team 3",
+    "level": "team",
+    "parent_id": "department_0_0",
+    "level_index": 2
+  },
+  {
+    "id": "team_0_0_3",
+    "name": "Team 4",
+    "level": "team",
+    "parent_id": "department_0_0",
+    "level_index": 3
+  },
+  {
+    "id": "team_0_0_4",
+    "name": "Team 5",
+    "level": "team",
+    "parent_id": "department_0_0",
+    "level_index": 4
+  },
+  {
+    "id": "team_0_0_5",
+    "name": "Team 6",
+    "level": "team",
+    "parent_id": "department_0_0",
+    "level_index": 5
+  },
+  {
+    "id": "department_0_1",
+    "name": "Paint",
+    "level": "department",
+    "parent_id": "division_0",
+    "level_index": 1
+  },
+  {
+    "id": "team_0_1_0",
+    "name": "Team 1",
+    "level": "team",
+    "parent_id": "department_0_1",
+    "level_index": 0
+  },
+  {
+    "id": "team_0_1_1",
+    "name": "Team 2",
+    "level": "team",
+    "parent_id": "department_0_1",
+    "level_index": 1
+  },
+  {
+    "id": "team_0_1_2",
+    "name": "Team 3",
+    "level": "team",
+    "parent_id": "department_0_1",
+    "level_index": 2
+  },
+  {
+    "id": "team_0_1_3",
+    "name": "Team 4",
+    "level": "team",
+    "parent_id": "department_0_1",
+    "level_index": 3
+  },
+  {
+    "id": "department_0_2",
+    "name": "Assembly",
+    "level": "department",
+    "parent_id": "division_0",
+    "level_index": 2
+  },
+  {
+    "id": "team_0_2_0",
+    "name": "Team 1",
+    "level": "team",
+    "parent_id": "department_0_2",
+    "level_index": 0
+  },
+  {
+    "id": "team_0_2_1",
+    "name": "Team 2",
+    "level": "team",
+    "parent_id": "department_0_2",
+    "level_index": 1
+  },
+  {
+    "id": "team_0_2_2",
+    "name": "Team 3",
+    "level": "team",
+    "parent_id": "department_0_2",
+    "level_index": 2
+  },
+  {
+    "id": "team_0_2_3",
+    "name": "Team 4",
+    "level": "team",
+    "parent_id": "department_0_2",
+    "level_index": 3
+  },
+  {
+    "id": "team_0_2_4",
+    "name": "Team 5",
+    "level": "team",
+    "parent_id": "department_0_2",
+    "level_index": 4
+  },
+  {
+    "id": "team_0_2_5",
+    "name": "Team 6",
+    "level": "team",
+    "parent_id": "department_0_2",
+    "level_index": 5
+  },
+  {
+    "id": "team_0_2_6",
+    "name": "Team 7",
+    "level": "team",
+    "parent_id": "department_0_2",
+    "level_index": 6
+  },
+  {
+    "id": "team_0_2_7",
+    "name": "Team 8",
+    "level": "team",
+    "parent_id": "department_0_2",
+    "level_index": 7
+  },
+  {
+    "id": "division_1",
+    "name": "R&D",
+    "level": "division",
+    "parent_id": "company_0",
+    "level_index": 1
+  },
+  {
+    "id": "department_1_0",
+    "name": "Vehicle Development",
+    "level": "department",
+    "parent_id": "division_1",
+    "level_index": 0
+  },
+  {
+    "id": "team_1_0_0",
+    "name": "Team 1",
+    "level": "team",
+    "parent_id": "department_1_0",
+    "level_index": 0
+  },
+  {
+    "id": "team_1_0_1",
+    "name": "Team 2",
+    "level": "team",
+    "parent_id": "department_1_0",
+    "level_index": 1
+  },
+  {
+    "id": "team_1_0_2",
+    "name": "Team 3",
+    "level": "team",
+    "parent_id": "department_1_0",
+    "level_index": 2
+  },
+  {
+    "id": "team_1_0_3",
+    "name": "Team 4",
+    "level": "team",
+    "parent_id": "department_1_0",
+    "level_index": 3
+  },
+  {
+    "id": "team_1_0_4",
+    "name": "Team 5",
+    "level": "team",
+    "parent_id": "department_1_0",
+    "level_index": 4
+  },
+  {
+    "id": "team_1_0_5",
+    "name": "Team 6",
+    "level": "team",
+    "parent_id": "department_1_0",
+    "level_index": 5
+  },
+  {
+    "id": "department_1_1",
+    "name": "E-Mobility",
+    "level": "department",
+    "parent_id": "division_1",
+    "level_index": 1
+  },
+  {
+    "id": "team_1_1_0",
+    "name": "Team 1",
+    "level": "team",
+    "parent_id": "department_1_1",
+    "level_index": 0
+  },
+  {
+    "id": "team_1_1_1",
+    "name": "Team 2",
+    "level": "team",
+    "parent_id": "department_1_1",
+    "level_index": 1
+  },
+  {
+    "id": "team_1_1_2",
+    "name": "Team 3",
+    "level": "team",
+    "parent_id": "department_1_1",
+    "level_index": 2
+  },
+  {
+    "id": "team_1_1_3",
+    "name": "Team 4",
+    "level": "team",
+    "parent_id": "department_1_1",
+    "level_index": 3
+  },
+  {
+    "id": "team_1_1_4",
+    "name": "Team 5",
+    "level": "team",
+    "parent_id": "department_1_1",
+    "level_index": 4
+  },
+  {
+    "id": "division_2",
+    "name": "Sales & Marketing",
+    "level": "division",
+    "parent_id": "company_0",
+    "level_index": 2
+  },
+  {
+    "id": "department_2_0",
+    "name": "Sales Ops",
+    "level": "department",
+    "parent_id": "division_2",
+    "level_index": 0
+  },
+  {
+    "id": "team_2_0_0",
+    "name": "Team 1",
+    "level": "team",
+    "parent_id": "department_2_0",
+    "level_index": 0
+  },
+  {
+    "id": "team_2_0_1",
+    "name": "Team 2",
+    "level": "team",
+    "parent_id": "department_2_0",
+    "level_index": 1
+  },
+  {
+    "id": "team_2_0_2",
+    "name": "Team 3",
+    "level": "team",
+    "parent_id": "department_2_0",
+    "level_index": 2
+  },
+  {
+    "id": "team_2_0_3",
+    "name": "Team 4",
+    "level": "team",
+    "parent_id": "department_2_0",
+    "level_index": 3
+  },
+  {
+    "id": "team_2_0_4",
+    "name": "Team 5",
+    "level": "team",
+    "parent_id": "department_2_0",
+    "level_index": 4
+  },
+  {
+    "id": "department_2_1",
+    "name": "Marketing",
+    "level": "department",
+    "parent_id": "division_2",
+    "level_index": 1
+  },
+  {
+    "id": "team_2_1_0",
+    "name": "Team 1",
+    "level": "team",
+    "parent_id": "department_2_1",
+    "level_index": 0
+  },
+  {
+    "id": "team_2_1_1",
+    "name": "Team 2",
+    "level": "team",
+    "parent_id": "department_2_1",
+    "level_index": 1
+  },
+  {
+    "id": "team_2_1_2",
+    "name": "Team 3",
+    "level": "team",
+    "parent_id": "department_2_1",
+    "level_index": 2
+  },
+  {
+    "id": "team_2_1_3",
+    "name": "Team 4",
+    "level": "team",
+    "parent_id": "department_2_1",
+    "level_index": 3
+  }
+]
