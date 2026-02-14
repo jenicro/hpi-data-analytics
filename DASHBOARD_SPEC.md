@@ -58,11 +58,11 @@ The dashboard shows one unit's culture profile with a grouped horizontal bar cha
 
 **Comparison: spider charts (one to many profiles)**
 
-**Spider (radar) charts** are used to **compare multiple units** — the same subdivisions you see in the forest plot (e.g. divisions under the org, departments under a division, teams under a department). They are **not** an alternative to the bar chart for showing a single profile; they are the **comparison view** alongside the forest plot.
+**Spider (radar) charts** are used to **compare multiple units** — the same subdivisions you see in the forest plot (e.g. divisions under the org, departments under a division, teams under a department). They are **not** an alternative to the bar chart for showing a single profile; they are the **comparison view** alongside the forest plot. **Spider charts show only contours (outlines); there is no filling** — each profile is drawn as a closed line with no shaded area inside, so overlapping profiles stay readable.
 
 - In the **"Compare children"** section, the user can switch between **Forest plot** and **Spider chart**. Both show the same entities (children of the current unit).
-- The spider shows **one contour (line) per unit**: each subdivision gets its own closed polygon (5 axes for super-dimensions, 15 axes for sub-dimensions), with a distinct color and a legend. So the chart can show **one to many different profiles** in one view — e.g. one line per division, or one per department, or one per team.
-- A **neutral reference** (e.g. 50) is often shown as a dotted circle. The **current level (parent)** can be drawn as a dashed reference line so users can compare each child to the parent. Contours are **lines only** (no fill) to keep overlapping profiles readable.
+- The spider shows **one contour per unit**: each subdivision gets its own closed polygon (5 axes for super-dimensions, 15 axes for sub-dimensions), with a distinct color and a legend. So the chart can show **one to many different profiles** in one view — e.g. one line per division, or one per department, or one per team.
+- A **neutral reference** (e.g. 50) is often shown as a dotted circle. The **current level (parent)** can be drawn as a dashed reference line so users can compare each child to the parent.
 - This makes **profile shape** comparable at a glance: which dimensions are high or low for each unit relative to the others.
 
 ![Spider comparison — one to many profiles (e.g. subdivisions vs reference)](docs/dashboard_spec_images/spider-5-compare.png)

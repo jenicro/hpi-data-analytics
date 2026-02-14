@@ -108,7 +108,7 @@ def chart_spider_15():
 
 
 def chart_spider_5_compare():
-    # Comparison mode: two teams + org benchmark on same spider
+    # Comparison mode: contours only (no fill) — two teams + org benchmark
     np.random.seed(10)
     team_a = np.clip(mean_super + np.random.randn(5) * 6, 35, 80)
     team_b = np.clip(mean_super + np.random.randn(5) * 6, 35, 80)
@@ -117,19 +117,19 @@ def chart_spider_5_compare():
     fig = go.Figure()
     fig.add_trace(go.Scatterpolar(
         r=list(team_a) + [team_a[0]], theta=theta_closed,
-        fill="toself", fillcolor="rgba(45,125,125,0.25)",
+        fill="none",
         line=dict(color="#2d7d7d", width=2),
         name="Team Alpha",
     ))
     fig.add_trace(go.Scatterpolar(
         r=list(team_b) + [team_b[0]], theta=theta_closed,
-        fill="toself", fillcolor="rgba(199,91,122,0.25)",
+        fill="none",
         line=dict(color="#c75b7a", width=2),
         name="Team Beta",
     ))
     fig.add_trace(go.Scatterpolar(
         r=org_bench + [org_bench[0]], theta=theta_closed,
-        fill="toself", fillcolor="rgba(150,150,150,0.1)",
+        fill="none",
         line=dict(color="#555", width=2, dash="dash"),
         name="Organization (benchmark)",
     ))
