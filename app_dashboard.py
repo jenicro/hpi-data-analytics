@@ -658,17 +658,8 @@ with tab_overview:
             st.subheader("How divisions compare")
             st.caption("Each division’s profile on the 5 culture dimensions. Compare at a glance.")
             # Dimension options: 5 super + 15 sub (label, kind, index)
-            dim_options = [(f"{short_labels[k]} (super)", "super", k) for k in range(5)]
-            dim_options += [(sub_names_15[j], "sub", j) for j in range(15)]
-            dim_labels = [d[0] for d in dim_options]
-            view_dims = st.radio("Show", ["Single dimension", "Multiple dimensions (grouped)"], horizontal=True, key="div_forest_mode")
-            if view_dims.startswith("Single"):
-                selected = st.selectbox("Dimension", range(len(dim_labels)), format_func=lambda i: dim_labels[i], key="div_forest_single")
-                selected_dims = [dim_options[selected]]
-            else:
-                selected_multi = st.multiselect("Dimensions to include", options=range(len(dim_labels)), format_func=lambda i: dim_labels[i], default=[0], key="div_forest_multi")
-                selected_dims = [dim_options[i] for i in selected_multi] if selected_multi else [dim_options[0]]
             cri_scale = 1.96
+            tab_forest_div, tab_spider_div = st.tabs(["Forest plot", "Spider chart"])
 
             def _org_mean_sd(kind, idx):
                 if kind == "super":
@@ -683,101 +674,168 @@ with tab_overview:
                     return float(ms[idx]), float(ss[idx])
                 return float(m[idx]), float(s[idx])
 
-            # Unique labels per row so no two divisions share a y-position; use numeric y + explicit ticks for alignment
             div_names = [(by_id.get(d) or {}).get("name", d) for d in div_ids]
             row_labels = ["Organization"] + div_names
             n_rows = len(row_labels)
-            y_numeric = list(range(n_rows))  # 0 = top (Organization), n_rows-1 = bottom
-            if len(selected_dims) == 1:
-                label, kind, idx = selected_dims[0]
-                org_m, org_s = _org_mean_sd(kind, idx)
-                org_lo = np.clip(org_m - cri_scale * org_s, 0, 100)
-                org_hi = np.clip(org_m + cri_scale * org_s, 0, 100)
-                means = [org_m] + [_div_mean_sd(d, kind, idx)[0] for d in div_ids]
-                los = [org_lo] + [np.clip(_div_mean_sd(d, kind, idx)[0] - cri_scale * _div_mean_sd(d, kind, idx)[1], 0, 100) for d in div_ids]
-                his = [org_hi] + [np.clip(_div_mean_sd(d, kind, idx)[0] + cri_scale * _div_mean_sd(d, kind, idx)[1], 0, 100) for d in div_ids]
-                err_plus = [his[i] - means[i] for i in range(n_rows)]
-                err_minus = [means[i] - los[i] for i in range(n_rows)]
-                fig_forest = go.Figure(go.Scatter(
-                    x=means,
-                    y=y_numeric,
-                    mode="markers",
-                    marker=dict(size=10, color="steelblue", symbol="diamond"),
-                    error_x=dict(type="data", array=err_plus, arrayminus=err_minus, thickness=1.5, color="steelblue"),
-                    name=label,
-                    hovertemplate="%{text}: %{x:.1f} (95%% CrI)<extra></extra>",
-                    text=row_labels,
-                ))
-                fig_forest.add_vline(x=org_m, line_dash="dot", line_color="gray", line_width=1.5, annotation_text="Org mean")
-                fig_forest.update_layout(
-                    title=f"Forest plot — {label}",
-                    xaxis=dict(title="Score (0–100)", range=[0, 105]),
-                    yaxis=dict(
-                        tickmode="array",
-                        tickvals=y_numeric,
-                        ticktext=row_labels,
-                        autorange="reversed",
-                        tickfont=dict(size=11),
-                    ),
-                    height=max(420, 72 * n_rows),
-                    margin=dict(l=220),
-                    template="plotly_white",
-                    showlegend=False,
-                )
-                st.plotly_chart(fig_forest, use_container_width=True)
-            else:
-                # Grouped: points within each row (Org/division) close together; clear gap before next row
-                n_dims = len(selected_dims)
-                group_band = 0.28   # y-span for dimension points within one group (tight)
-                gap = 0.72          # gap before next group so "these belong together, these don't"
-                y_per_row = group_band + gap  # 1.0
-                ref_label, ref_kind, ref_idx = selected_dims[0]
-                org_ref_m, _ = _org_mean_sd(ref_kind, ref_idx)
-                fig_forest = go.Figure()
-                for i, (label, kind, idx) in enumerate(selected_dims):
+
+            with tab_forest_div:
+                dim_options = [(f"{short_labels[k]} (super)", "super", k) for k in range(5)]
+                dim_options += [(sub_names_15[j], "sub", j) for j in range(15)]
+                dim_labels = [d[0] for d in dim_options]
+                view_dims = st.radio("Show", ["Single dimension", "Multiple dimensions (grouped)"], horizontal=True, key="div_forest_mode")
+                if view_dims.startswith("Single"):
+                    selected = st.selectbox("Dimension", range(len(dim_labels)), format_func=lambda i: dim_labels[i], key="div_forest_single")
+                    selected_dims = [dim_options[selected]]
+                else:
+                    selected_multi = st.multiselect("Dimensions to include", options=range(len(dim_labels)), format_func=lambda i: dim_labels[i], default=[0], key="div_forest_multi")
+                    selected_dims = [dim_options[i] for i in selected_multi] if selected_multi else [dim_options[0]]
+                y_numeric = list(range(n_rows))
+                if len(selected_dims) == 1:
+                    label, kind, idx = selected_dims[0]
                     org_m, org_s = _org_mean_sd(kind, idx)
                     org_lo = np.clip(org_m - cri_scale * org_s, 0, 100)
                     org_hi = np.clip(org_m + cri_scale * org_s, 0, 100)
                     means = [org_m] + [_div_mean_sd(d, kind, idx)[0] for d in div_ids]
                     los = [org_lo] + [np.clip(_div_mean_sd(d, kind, idx)[0] - cri_scale * _div_mean_sd(d, kind, idx)[1], 0, 100) for d in div_ids]
                     his = [org_hi] + [np.clip(_div_mean_sd(d, kind, idx)[0] + cri_scale * _div_mean_sd(d, kind, idx)[1], 0, 100) for d in div_ids]
-                    err_plus = [his[j] - means[j] for j in range(n_rows)]
-                    err_minus = [means[j] - los[j] for j in range(n_rows)]
-                    color = domain_colors[idx // 3] if kind == "sub" else domain_colors[idx]
-                    # Within each row block: dimensions sit in a tight band; next row starts after gap
-                    div_step = (group_band / max(n_dims - 1, 1)) * i
-                    y_grouped = [r * y_per_row + div_step for r in range(n_rows)]
-                    fig_forest.add_trace(go.Scatter(
+                    err_plus = [his[i] - means[i] for i in range(n_rows)]
+                    err_minus = [means[i] - los[i] for i in range(n_rows)]
+                    fig_forest = go.Figure(go.Scatter(
                         x=means,
-                        y=y_grouped,
+                        y=y_numeric,
                         mode="markers",
-                        marker=dict(size=8, color=color, symbol="circle"),
-                        error_x=dict(type="data", array=err_plus, arrayminus=err_minus, thickness=1.2, color=color),
+                        marker=dict(size=10, color="steelblue", symbol="diamond"),
+                        error_x=dict(type="data", array=err_plus, arrayminus=err_minus, thickness=1.5, color="steelblue"),
                         name=label,
-                        hovertemplate="%{text}: %{x:.1f} — " + label + "<extra></extra>",
+                        hovertemplate="%{text}: %{x:.1f} (95%% CrI)<extra></extra>",
                         text=row_labels,
                     ))
-                # One y-tick per row block, centered in the group band
-                tickvals_grouped = [r * y_per_row + group_band / 2 for r in range(n_rows)]
-                fig_forest.add_vline(x=org_ref_m, line_dash="dot", line_color="gray", line_width=1.5, annotation_text="Org mean")
-                fig_forest.update_layout(
-                    title="Forest plot — grouped by dimension",
-                    xaxis=dict(title="Score (0–100)", range=[0, 105]),
-                    yaxis=dict(
-                        tickmode="array",
-                        tickvals=tickvals_grouped,
-                        ticktext=row_labels,
-                        autorange="reversed",
-                        tickfont=dict(size=11),
-                    ),
-                    height=max(420, 72 * n_rows),
-                    margin=dict(l=220),
-                    template="plotly_white",
-                    showlegend=True,
-                    legend=dict(orientation="h", yanchor="bottom", y=1.02),
-                )
-                st.plotly_chart(fig_forest, use_container_width=True)
-            st.caption("Organization at top; dotted line = organization mean. 95% credibility intervals shown.")
+                    fig_forest.add_vline(x=org_m, line_dash="dot", line_color="gray", line_width=1.5, annotation_text="Org mean")
+                    fig_forest.update_layout(
+                        title=f"Forest plot — {label}",
+                        xaxis=dict(title="Score (0–100)", range=[0, 105]),
+                        yaxis=dict(
+                            tickmode="array",
+                            tickvals=y_numeric,
+                            ticktext=row_labels,
+                            autorange="reversed",
+                            tickfont=dict(size=11),
+                        ),
+                        height=max(420, 72 * n_rows),
+                        margin=dict(l=220),
+                        template="plotly_white",
+                        showlegend=False,
+                    )
+                    st.plotly_chart(fig_forest, use_container_width=True)
+                else:
+                    # Grouped: points within each row (Org/division) close together; clear gap before next row
+                    n_dims = len(selected_dims)
+                    group_band = 0.28   # y-span for dimension points within one group (tight)
+                    gap = 0.72          # gap before next group so "these belong together, these don't"
+                    y_per_row = group_band + gap  # 1.0
+                    ref_label, ref_kind, ref_idx = selected_dims[0]
+                    org_ref_m, _ = _org_mean_sd(ref_kind, ref_idx)
+                    fig_forest = go.Figure()
+                    for i, (label, kind, idx) in enumerate(selected_dims):
+                        org_m, org_s = _org_mean_sd(kind, idx)
+                        org_lo = np.clip(org_m - cri_scale * org_s, 0, 100)
+                        org_hi = np.clip(org_m + cri_scale * org_s, 0, 100)
+                        means = [org_m] + [_div_mean_sd(d, kind, idx)[0] for d in div_ids]
+                        los = [org_lo] + [np.clip(_div_mean_sd(d, kind, idx)[0] - cri_scale * _div_mean_sd(d, kind, idx)[1], 0, 100) for d in div_ids]
+                        his = [org_hi] + [np.clip(_div_mean_sd(d, kind, idx)[0] + cri_scale * _div_mean_sd(d, kind, idx)[1], 0, 100) for d in div_ids]
+                        err_plus = [his[j] - means[j] for j in range(n_rows)]
+                        err_minus = [means[j] - los[j] for j in range(n_rows)]
+                        color = domain_colors[idx // 3] if kind == "sub" else domain_colors[idx]
+                        div_step = (group_band / max(n_dims - 1, 1)) * i
+                        y_grouped = [r * y_per_row + div_step for r in range(n_rows)]
+                        fig_forest.add_trace(go.Scatter(
+                            x=means,
+                            y=y_grouped,
+                            mode="markers",
+                            marker=dict(size=8, color=color, symbol="circle"),
+                            error_x=dict(type="data", array=err_plus, arrayminus=err_minus, thickness=1.2, color=color),
+                            name=label,
+                            hovertemplate="%{text}: %{x:.1f} — " + label + "<extra></extra>",
+                            text=row_labels,
+                        ))
+                    tickvals_grouped = [r * y_per_row + group_band / 2 for r in range(n_rows)]
+                    fig_forest.add_vline(x=org_ref_m, line_dash="dot", line_color="gray", line_width=1.5, annotation_text="Org mean")
+                    fig_forest.update_layout(
+                        title="Forest plot — grouped by dimension",
+                        xaxis=dict(title="Score (0–100)", range=[0, 105]),
+                        yaxis=dict(
+                            tickmode="array",
+                            tickvals=tickvals_grouped,
+                            ticktext=row_labels,
+                            autorange="reversed",
+                            tickfont=dict(size=11),
+                        ),
+                        height=max(420, 72 * n_rows),
+                        margin=dict(l=220),
+                        template="plotly_white",
+                        showlegend=True,
+                        legend=dict(orientation="h", yanchor="bottom", y=1.02),
+                    )
+                    st.plotly_chart(fig_forest, use_container_width=True)
+                st.caption("Organization at top; dotted line = organization mean. 95% credibility intervals shown.")
+
+            with tab_spider_div:
+                spider_view = st.radio("Show", ["Super dimensions (5)", "Subdimensions (15)"], horizontal=True, key="div_spider_view")
+                theta_super = short_labels + [short_labels[0]]
+                theta_sub = list(sub_names_15) + [sub_names_15[0]]
+                if spider_view.startswith("Super"):
+                    r_org = [float(mean_super[k]) for k in range(5)] + [float(mean_super[0])]
+                    fig_spider = go.Figure(go.Scatterpolar(
+                        r=r_org,
+                        theta=theta_super,
+                        line=dict(color="#2d7d7d", width=2),
+                        name="Organization",
+                    ))
+                    for d in div_ids:
+                        r_div = [_div_mean_sd(d, "super", k)[0] for k in range(5)] + [_div_mean_sd(d, "super", 0)[0]]
+                        fig_spider.add_trace(go.Scatterpolar(
+                            r=r_div,
+                            theta=theta_super,
+                            line=dict(width=1.5),
+                            name=row_labels[div_ids.index(d) + 1],
+                        ))
+                    fig_spider.update_layout(
+                        polar=dict(radialaxis=dict(visible=True, range=[0, 100], tickfont=dict(size=10)), angularaxis=dict(tickfont=dict(size=11))),
+                        title="Divisions vs Organization — 5 super-dimensions",
+                        height=480,
+                        margin=dict(t=48, b=24),
+                        template="plotly_white",
+                        showlegend=True,
+                        legend=dict(orientation="h", yanchor="bottom", y=1.02),
+                    )
+                    st.plotly_chart(fig_spider, use_container_width=True)
+                else:
+                    r_org_sub = [float(mean_sub[j]) for j in range(15)] + [float(mean_sub[0])]
+                    fig_spider_sub = go.Figure(go.Scatterpolar(
+                        r=r_org_sub,
+                        theta=theta_sub,
+                        line=dict(color="#2d7d7d", width=2),
+                        name="Organization",
+                    ))
+                    for d in div_ids:
+                        r_div_sub = [_div_mean_sd(d, "sub", j)[0] for j in range(15)] + [_div_mean_sd(d, "sub", 0)[0]]
+                        fig_spider_sub.add_trace(go.Scatterpolar(
+                            r=r_div_sub,
+                            theta=theta_sub,
+                            line=dict(width=1.2),
+                            name=row_labels[div_ids.index(d) + 1],
+                        ))
+                    fig_spider_sub.update_layout(
+                        polar=dict(radialaxis=dict(visible=True, range=[0, 100], tickfont=dict(size=9)), angularaxis=dict(tickfont=dict(size=9))),
+                        title="Divisions vs Organization — 15 subdimensions",
+                        height=520,
+                        margin=dict(t=48, b=24),
+                        template="plotly_white",
+                        showlegend=True,
+                        legend=dict(orientation="h", yanchor="bottom", y=1.02),
+                    )
+                    st.plotly_chart(fig_spider_sub, use_container_width=True)
+                st.caption("Spider charts compare each division to the organization on all dimensions at once.")
 
         # -------------------------------------------------------------------------
         # Drill down (same hierarchy as Statistical tab: Org → Division → Dept → Team)
@@ -896,18 +954,24 @@ with tab_overview:
                 tuple(sunburst_parents),
             )
             clicked_id = sunburst_select(plot_json=fig_sunburst_json, key="org_sunburst_select", height=380)
-            # Store click and rerun so next run applies it before widgets are created (skip if we just applied pending to avoid loop)
-            if clicked_id is not None and clicked_id in sunburst_ids and not _applied_sunburst_pending:
-                # Click on center (current root) = go back one level
-                if clicked_id == sunburst_level_id:
-                    idx_cur = sunburst_ids.index(sunburst_level_id)
-                    parent_id = sunburst_parents[idx_cur] if idx_cur < len(sunburst_parents) else ""
-                    if parent_id:  # not at top
-                        st.session_state["_sunburst_pending_id"] = parent_id
+            # Store click and rerun so next run applies it before widgets are created.
+            # Ignore repeated stale click payloads from component reruns.
+            if clicked_id is None:
+                st.session_state.pop("_sunburst_last_clicked_id", None)
+            elif clicked_id in sunburst_ids and not _applied_sunburst_pending:
+                last_clicked = st.session_state.get("_sunburst_last_clicked_id")
+                if clicked_id != last_clicked:
+                    st.session_state["_sunburst_last_clicked_id"] = clicked_id
+                    # Click on center (current root) = go back one level
+                    if clicked_id == sunburst_level_id:
+                        idx_cur = sunburst_ids.index(sunburst_level_id)
+                        parent_id = sunburst_parents[idx_cur] if idx_cur < len(sunburst_parents) else ""
+                        if parent_id:  # not at top
+                            st.session_state["_sunburst_pending_id"] = parent_id
+                            st.rerun()
+                    else:
+                        st.session_state["_sunburst_pending_id"] = clicked_id
                         st.rerun()
-                else:
-                    st.session_state["_sunburst_pending_id"] = clicked_id
-                    st.rerun()
 
         # Show which unit the dashboard is scoped to (scores and charts below are for this unit)
         if level_ov == "Organization":
@@ -999,11 +1063,13 @@ with tab_overview:
             st.subheader(f"Scores at a glance — {viewing_name}")
             view_scores_d = st.radio("Show as", ["Bar charts", "Spider"], horizontal=True, key="overview_drill_scores_as")
             if view_scores_d == "Bar charts":
-                show_cri_bars_d = st.checkbox("Show 95% credibility intervals in bar charts", value=False, key="overview_drill_show_cri_bars")
+                if "overview_drill_show_cri_bars" not in st.session_state:
+                    st.session_state["overview_drill_show_cri_bars"] = True
+                show_cri_bars_d = st.checkbox("Show 95% credibility intervals in bar charts", key="overview_drill_show_cri_bars")
                 sub_colors_d = [domain_colors[i // 3] for i in range(15)]
                 sep_label_d = " "
                 all_y_d = list(short_labels) + [sep_label_d] + list(sub_names_15)
-                all_x_d = list(mean_super_d) + [0] + list(mean_sub_d)
+                all_x_d = [float(x) for x in (list(mean_super_d) + [0] + list(mean_sub_d))]
                 all_colors_d = list(domain_colors) + ["rgba(0,0,0,0)"] + sub_colors_d
                 all_text_d = [f"{v:.1f}" for v in mean_super_d] + [""] + [f"{v:.1f}" for v in mean_sub_d]
                 cri_strs_d = (
@@ -1024,10 +1090,12 @@ with tab_overview:
                     customdata=bar_customdata_d,
                 )
                 if show_cri_bars_d:
+                    err_plus = [float(x) for x in list(err_plus_super_d) + [0] + list(err_plus_sub_d)]
+                    err_minus = [float(x) for x in list(err_minus_super_d) + [0] + list(err_minus_sub_d)]
                     bar_kw_d["error_x"] = dict(
                         type="data",
-                        array=list(err_plus_super_d) + [0] + list(err_plus_sub_d),
-                        arrayminus=list(err_minus_super_d) + [0] + list(err_minus_sub_d),
+                        array=err_plus,
+                        arrayminus=err_minus,
                         thickness=1.5,
                         color="rgba(0,0,0,0.5)",
                     )
