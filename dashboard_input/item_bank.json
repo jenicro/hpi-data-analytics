@@ -2,526 +2,526 @@
   {
     "item_id": "zuversicht_item1",
     "dimension_id": "zuversicht",
-    "nu": 49.71350408325209,
-    "lambda": 1.2509781485579117,
-    "sigma": 5.326097136834587
+    "nu": 60.48570596077957,
+    "lambda": 1.1523657684546484,
+    "sigma": 8.705360878143008
   },
   {
     "item_id": "zuversicht_item2",
     "dimension_id": "zuversicht",
-    "nu": 61.72014574791522,
-    "lambda": 1.3545540935354246,
-    "sigma": 7.081402950272494
+    "nu": 30.320898501616654,
+    "lambda": 1.2436025602012113,
+    "sigma": 5.563560398828251
   },
   {
     "item_id": "zuversicht_item3",
     "dimension_id": "zuversicht",
-    "nu": 72.4247582765255,
-    "lambda": 1.218663446241372,
-    "sigma": 6.829361946591434
+    "nu": 69.98768903383777,
+    "lambda": 1.3467745623980794,
+    "sigma": 8.887739687458177
   },
   {
     "item_id": "zuversicht_item4",
     "dimension_id": "zuversicht",
-    "nu": 39.40586854998786,
-    "lambda": 1.4357849769000648,
-    "sigma": 7.570176916846067
+    "nu": 39.04079467637551,
+    "lambda": 1.338839138723175,
+    "sigma": 8.264825940094896
   },
   {
     "item_id": "zuversicht_item5",
     "dimension_id": "zuversicht",
-    "nu": 29.283740487885286,
-    "lambda": 1.258367397557035,
-    "sigma": 6.408666876891912
+    "nu": 50.37297495193052,
+    "lambda": 0.5242181279776967,
+    "sigma": 8.875847658041637
   },
   {
     "item_id": "richtung_item1",
     "dimension_id": "richtung",
-    "nu": 58.765210300445084,
-    "lambda": 1.2681363739553224,
-    "sigma": 7.226037972221036
+    "nu": 75.09120612079198,
+    "lambda": 1.2510861987216613,
+    "sigma": 5.188222900712573
   },
   {
     "item_id": "richtung_item2",
     "dimension_id": "richtung",
-    "nu": 50.50563032131545,
-    "lambda": 1.4748196158318165,
-    "sigma": 8.48334778905665
+    "nu": 59.22970247360336,
+    "lambda": 1.3808103968384775,
+    "sigma": 15.51707913841149
   },
   {
     "item_id": "richtung_item3",
     "dimension_id": "richtung",
-    "nu": 39.16218132660119,
-    "lambda": 1.254303239507504,
-    "sigma": 13.619981733455354
+    "nu": 29.268405984438587,
+    "lambda": 1.271921863806348,
+    "sigma": 8.065219860137164
   },
   {
     "item_id": "richtung_item4",
     "dimension_id": "richtung",
-    "nu": 70.71525597897096,
-    "lambda": 0.6117217448016476,
-    "sigma": 7.434392539772156
+    "nu": 38.22402973063137,
+    "lambda": 0.6526321331442975,
+    "sigma": 7.178666470502696
   },
   {
     "item_id": "richtung_item5",
     "dimension_id": "richtung",
-    "nu": 24.661344419648206,
-    "lambda": 1.49408543494712,
-    "sigma": 8.123440199539562
+    "nu": 47.35253474510864,
+    "lambda": 0.5107283920094402,
+    "sigma": 6.151310363981755
   },
   {
     "item_id": "energie_item1",
     "dimension_id": "energie",
-    "nu": 71.35487613668118,
-    "lambda": 0.567094714907003,
-    "sigma": 8.337588113367282
+    "nu": 47.174101968259215,
+    "lambda": 1.2907470940213237,
+    "sigma": 8.25510418583366
   },
   {
     "item_id": "energie_item2",
     "dimension_id": "energie",
-    "nu": 36.995806429312836,
-    "lambda": 1.1562758834347195,
-    "sigma": 6.643016527756197
+    "nu": 29.800528699638306,
+    "lambda": 1.1704267349231512,
+    "sigma": 17.559947546487617
   },
   {
     "item_id": "energie_item3",
     "dimension_id": "energie",
-    "nu": 29.539792884363095,
-    "lambda": 0.6868626629872624,
-    "sigma": 5.431733141359382
+    "nu": 60.44359999262095,
+    "lambda": 1.4480527404315198,
+    "sigma": 7.21772728112169
   },
   {
     "item_id": "energie_item4",
     "dimension_id": "energie",
-    "nu": 52.30382428618803,
-    "lambda": 1.1557005047685014,
-    "sigma": 6.398294004859174
+    "nu": 70.18033773875624,
+    "lambda": 1.3663197906743423,
+    "sigma": 6.070762876844328
   },
   {
     "item_id": "energie_item5",
     "dimension_id": "energie",
-    "nu": 58.614032251716104,
-    "lambda": 1.3617400788371996,
-    "sigma": 7.5347860329327965
+    "nu": 39.10569024688799,
+    "lambda": 1.2514924540493366,
+    "sigma": 5.756761295647529
   },
   {
     "item_id": "authentische_verbundenheit_item1",
     "dimension_id": "authentische_verbundenheit",
-    "nu": 37.37954644556097,
-    "lambda": 1.4284534175469026,
-    "sigma": 17.27210598419026
+    "nu": 49.93592019664051,
+    "lambda": 1.1566763637007185,
+    "sigma": 6.486549258065635
   },
   {
     "item_id": "authentische_verbundenheit_item2",
     "dimension_id": "authentische_verbundenheit",
-    "nu": 25.98465854653732,
-    "lambda": 0.5071546909091231,
-    "sigma": 5.1686165134591135
+    "nu": 73.84905750654849,
+    "lambda": 1.4637616449416098,
+    "sigma": 8.084049999743877
   },
   {
     "item_id": "authentische_verbundenheit_item3",
     "dimension_id": "authentische_verbundenheit",
-    "nu": 62.5350284110145,
-    "lambda": 0.5008452524932622,
-    "sigma": 8.098362047944121
+    "nu": 59.7551392088897,
+    "lambda": 1.192866222255239,
+    "sigma": 7.56759884796667
   },
   {
     "item_id": "authentische_verbundenheit_item4",
     "dimension_id": "authentische_verbundenheit",
-    "nu": 74.61802648913803,
-    "lambda": 1.4434333217356268,
-    "sigma": 14.985529823141071
+    "nu": 26.7729751566795,
+    "lambda": 0.6135941576604235,
+    "sigma": 5.5240200471649334
   },
   {
     "item_id": "authentische_verbundenheit_item5",
     "dimension_id": "authentische_verbundenheit",
-    "nu": 51.93821933781272,
-    "lambda": 1.1963252787575689,
-    "sigma": 8.085581253935223
+    "nu": 37.30041046694847,
+    "lambda": 0.5312253410896617,
+    "sigma": 17.007646615936025
   },
   {
     "item_id": "vertrauensvolle_zusammenarbeit_item1",
     "dimension_id": "vertrauensvolle_zusammenarbeit",
-    "nu": 25.86355983523991,
-    "lambda": 0.5430418869280138,
-    "sigma": 7.463834256697281
+    "nu": 49.62554932718803,
+    "lambda": 1.306675874746919,
+    "sigma": 7.917956112823189
   },
   {
     "item_id": "vertrauensvolle_zusammenarbeit_item2",
     "dimension_id": "vertrauensvolle_zusammenarbeit",
-    "nu": 48.419220924601724,
-    "lambda": 0.5196933010260665,
-    "sigma": 14.700560725601273
+    "nu": 74.11826400421263,
+    "lambda": 0.5215578247079659,
+    "sigma": 17.761022303092474
   },
   {
     "item_id": "vertrauensvolle_zusammenarbeit_item3",
     "dimension_id": "vertrauensvolle_zusammenarbeit",
-    "nu": 60.20373932971377,
-    "lambda": 1.3618981585779768,
-    "sigma": 7.947085668128821
+    "nu": 25.75642317429858,
+    "lambda": 1.4923897827548387,
+    "sigma": 7.050519731709181
   },
   {
     "item_id": "vertrauensvolle_zusammenarbeit_item4",
     "dimension_id": "vertrauensvolle_zusammenarbeit",
-    "nu": 38.392101473052584,
-    "lambda": 1.1521302537564806,
-    "sigma": 6.050194740808145
+    "nu": 60.50373422820634,
+    "lambda": 1.4795092445702158,
+    "sigma": 6.657090024870222
   },
   {
     "item_id": "vertrauensvolle_zusammenarbeit_item5",
     "dimension_id": "vertrauensvolle_zusammenarbeit",
-    "nu": 72.70536449512825,
-    "lambda": 1.3653828632393978,
-    "sigma": 8.266535624780348
+    "nu": 38.22995565444927,
+    "lambda": 1.2979720453629486,
+    "sigma": 7.320472947856418
   },
   {
     "item_id": "teamspirit_item1",
     "dimension_id": "teamspirit",
-    "nu": 62.635502812978714,
-    "lambda": 1.345743142763251,
-    "sigma": 7.635677957265791
+    "nu": 39.816839968218524,
+    "lambda": 1.4239167276859628,
+    "sigma": 6.821223757454218
   },
   {
     "item_id": "teamspirit_item2",
     "dimension_id": "teamspirit",
-    "nu": 74.12435033382432,
-    "lambda": 1.2272108649626043,
-    "sigma": 16.6279412517277
+    "nu": 72.22430250476258,
+    "lambda": 1.2750521833740327,
+    "sigma": 5.6394112023614476
   },
   {
     "item_id": "teamspirit_item3",
     "dimension_id": "teamspirit",
-    "nu": 40.36872703277001,
-    "lambda": 0.5046124795581968,
-    "sigma": 6.935085357015765
+    "nu": 28.039984742716737,
+    "lambda": 1.4745674692661148,
+    "sigma": 8.794955864778238
   },
   {
     "item_id": "teamspirit_item4",
     "dimension_id": "teamspirit",
-    "nu": 49.92441550360038,
-    "lambda": 1.207491061083604,
-    "sigma": 6.123654262739098
+    "nu": 61.14686640085465,
+    "lambda": 0.6699057957042011,
+    "sigma": 8.023216890382695
   },
   {
     "item_id": "teamspirit_item5",
     "dimension_id": "teamspirit",
-    "nu": 28.21417116630592,
-    "lambda": 0.7329081905480748,
-    "sigma": 8.382575339520253
+    "nu": 52.01935241859778,
+    "lambda": 1.354879105236105,
+    "sigma": 8.329180043552514
   },
   {
     "item_id": "entwicklung_item1",
     "dimension_id": "entwicklung",
-    "nu": 59.4129731315827,
-    "lambda": 1.195289886386975,
-    "sigma": 6.78686902815833
+    "nu": 61.62652127892524,
+    "lambda": 1.1982281965544606,
+    "sigma": 7.2083274030792115
   },
   {
     "item_id": "entwicklung_item2",
     "dimension_id": "entwicklung",
-    "nu": 52.819107985550566,
-    "lambda": 1.4244354375178248,
-    "sigma": 5.840551382116901
+    "nu": 36.71042151169153,
+    "lambda": 1.4115527006599133,
+    "sigma": 14.758750382430641
   },
   {
     "item_id": "entwicklung_item3",
     "dimension_id": "entwicklung",
-    "nu": 71.40495557892275,
-    "lambda": 1.2210232813866064,
-    "sigma": 17.458563777204663
+    "nu": 69.83065680929253,
+    "lambda": 1.4864906886599674,
+    "sigma": 7.7932911004105545
   },
   {
     "item_id": "entwicklung_item4",
     "dimension_id": "entwicklung",
-    "nu": 38.21221691695873,
-    "lambda": 1.3974881169153937,
-    "sigma": 7.033510387667346
+    "nu": 26.978859204639537,
+    "lambda": 0.6293619789774283,
+    "sigma": 7.0685800448218945
   },
   {
     "item_id": "entwicklung_item5",
     "dimension_id": "entwicklung",
-    "nu": 28.082430486371123,
-    "lambda": 1.2572662563458232,
-    "sigma": 6.773524932736269
+    "nu": 47.91396775006583,
+    "lambda": 1.4005881003898528,
+    "sigma": 5.189680068795452
   },
   {
     "item_id": "inspiration_item1",
     "dimension_id": "inspiration",
-    "nu": 73.5860075985417,
-    "lambda": 0.5720397591409752,
-    "sigma": 17.95797286507154
+    "nu": 60.06349283038605,
+    "lambda": 1.19075024018012,
+    "sigma": 5.877825635005122
   },
   {
     "item_id": "inspiration_item2",
     "dimension_id": "inspiration",
-    "nu": 27.672822827119013,
-    "lambda": 1.2139526522139013,
-    "sigma": 7.76347555735241
+    "nu": 70.61605798350757,
+    "lambda": 1.4663498954325827,
+    "sigma": 5.085877853827603
   },
   {
     "item_id": "inspiration_item3",
     "dimension_id": "inspiration",
-    "nu": 62.857290112322964,
-    "lambda": 1.1584054576160314,
-    "sigma": 7.842527791996497
+    "nu": 47.92979989827449,
+    "lambda": 1.3452069495999472,
+    "sigma": 5.009383950273965
   },
   {
     "item_id": "inspiration_item4",
     "dimension_id": "inspiration",
-    "nu": 48.74113938224521,
-    "lambda": 0.5735782912500377,
-    "sigma": 8.330305630496792
+    "nu": 39.165903973698434,
+    "lambda": 1.3465608219261902,
+    "sigma": 5.6800075503201075
   },
   {
     "item_id": "inspiration_item5",
     "dimension_id": "inspiration",
-    "nu": 39.99922958927769,
-    "lambda": 0.5309437041425457,
-    "sigma": 8.706176870917654
+    "nu": 27.073725804345784,
+    "lambda": 1.4968280219433674,
+    "sigma": 13.163032070692934
   },
   {
     "item_id": "anerkennung_item1",
     "dimension_id": "anerkennung",
-    "nu": 38.008314609368284,
-    "lambda": 1.1739128027287162,
-    "sigma": 7.885577126718946
+    "nu": 29.18114129318265,
+    "lambda": 1.2763707950102308,
+    "sigma": 6.855694322710152
   },
   {
     "item_id": "anerkennung_item2",
     "dimension_id": "anerkennung",
-    "nu": 75.30675241626184,
-    "lambda": 1.2073020558420733,
-    "sigma": 5.435681227706654
+    "nu": 62.75632417357166,
+    "lambda": 0.5223462553229761,
+    "sigma": 15.871076822058143
   },
   {
     "item_id": "anerkennung_item3",
     "dimension_id": "anerkennung",
-    "nu": 30.599168914374808,
-    "lambda": 1.4365346099562837,
-    "sigma": 16.91591630712096
+    "nu": 49.2327989743431,
+    "lambda": 0.5667063733743991,
+    "sigma": 7.620877461987691
   },
   {
     "item_id": "anerkennung_item4",
     "dimension_id": "anerkennung",
-    "nu": 51.35757124904404,
-    "lambda": 1.2205992904215264,
-    "sigma": 5.326920812199487
+    "nu": 38.40462044772372,
+    "lambda": 1.4899800567465746,
+    "sigma": 8.216608483033461
   },
   {
     "item_id": "anerkennung_item5",
     "dimension_id": "anerkennung",
-    "nu": 60.46719747524589,
-    "lambda": 1.4712320429863277,
-    "sigma": 8.350489303102588
+    "nu": 75.00075073178189,
+    "lambda": 1.1565101663499116,
+    "sigma": 5.6665701954056615
   },
   {
     "item_id": "neugier_item1",
     "dimension_id": "neugier",
-    "nu": 70.98217312700284,
-    "lambda": 1.2540984079284903,
-    "sigma": 5.0557043473366425
+    "nu": 28.491572803244566,
+    "lambda": 1.3562436886034503,
+    "sigma": 16.628483389169194
   },
   {
     "item_id": "neugier_item2",
     "dimension_id": "neugier",
-    "nu": 28.626673968487292,
-    "lambda": 0.6596712680832783,
-    "sigma": 14.231749617330287
+    "nu": 48.50913392377195,
+    "lambda": 1.2338807453661798,
+    "sigma": 5.302692565294761
   },
   {
     "item_id": "neugier_item3",
     "dimension_id": "neugier",
-    "nu": 59.47081990293336,
-    "lambda": 0.6471895689386717,
-    "sigma": 14.495030924643961
+    "nu": 69.77518146735241,
+    "lambda": 1.3046768726017384,
+    "sigma": 6.233392370867603
   },
   {
     "item_id": "neugier_item4",
     "dimension_id": "neugier",
-    "nu": 38.741064309102846,
-    "lambda": 1.2927309326863698,
-    "sigma": 7.056245966167861
+    "nu": 39.95942870430718,
+    "lambda": 0.6816254476246181,
+    "sigma": 7.658675647547112
   },
   {
     "item_id": "neugier_item5",
     "dimension_id": "neugier",
-    "nu": 48.2984644399824,
-    "lambda": 1.4329782390974801,
-    "sigma": 14.935435827037606
+    "nu": 61.37854781575576,
+    "lambda": 1.2608753684059273,
+    "sigma": 8.82382965071548
   },
   {
     "item_id": "good_fightclub_item1",
     "dimension_id": "good_fightclub",
-    "nu": 40.80461850408686,
-    "lambda": 1.185978256970644,
-    "sigma": 13.533887617265302
+    "nu": 59.166093303566605,
+    "lambda": 1.18135168857719,
+    "sigma": 7.669807683927706
   },
   {
     "item_id": "good_fightclub_item2",
     "dimension_id": "good_fightclub",
-    "nu": 62.60070746681913,
-    "lambda": 1.1694027760668275,
-    "sigma": 5.723789461776779
+    "nu": 52.301207222929875,
+    "lambda": 0.7714067278672642,
+    "sigma": 14.587704503941927
   },
   {
     "item_id": "good_fightclub_item3",
     "dimension_id": "good_fightclub",
-    "nu": 72.74132586049976,
-    "lambda": 0.7513923203416799,
-    "sigma": 15.649343019159094
+    "nu": 41.43903310382528,
+    "lambda": 0.5836250087965191,
+    "sigma": 7.453978360496029
   },
   {
     "item_id": "good_fightclub_item4",
     "dimension_id": "good_fightclub",
-    "nu": 52.19953859910106,
-    "lambda": 1.1788422268806995,
-    "sigma": 7.270300621723916
+    "nu": 69.74302913721834,
+    "lambda": 0.5424021554792431,
+    "sigma": 5.450463493359786
   },
   {
     "item_id": "good_fightclub_item5",
     "dimension_id": "good_fightclub",
-    "nu": 26.038049384343818,
-    "lambda": 1.267763296690919,
-    "sigma": 7.874299712772263
+    "nu": 26.649294743049133,
+    "lambda": 0.7162532042408374,
+    "sigma": 14.913989367300083
   },
   {
     "item_id": "grit_item1",
     "dimension_id": "grit",
-    "nu": 48.122774883479764,
-    "lambda": 1.1992780513096923,
-    "sigma": 16.213756566651327
+    "nu": 50.515934004213825,
+    "lambda": 0.5964057468237653,
+    "sigma": 5.766679220248939
   },
   {
     "item_id": "grit_item2",
     "dimension_id": "grit",
-    "nu": 73.32249976002618,
-    "lambda": 1.244592701383329,
-    "sigma": 14.121211222984154
+    "nu": 40.32108141774907,
+    "lambda": 1.4180005812833598,
+    "sigma": 17.10568005703748
   },
   {
     "item_id": "grit_item3",
     "dimension_id": "grit",
-    "nu": 39.059536998891666,
-    "lambda": 1.2126772102341201,
-    "sigma": 5.710953155331826
+    "nu": 70.53973835134964,
+    "lambda": 1.3492166390706517,
+    "sigma": 8.001108749664601
   },
   {
     "item_id": "grit_item4",
     "dimension_id": "grit",
-    "nu": 30.528764374930454,
-    "lambda": 0.5944686927889741,
-    "sigma": 8.010396139817534
+    "nu": 58.22690489952906,
+    "lambda": 1.3404666091698614,
+    "sigma": 15.133182635634066
   },
   {
     "item_id": "grit_item5",
     "dimension_id": "grit",
-    "nu": 59.28568646740963,
-    "lambda": 1.2990830685825607,
-    "sigma": 5.102522937973104
+    "nu": 25.12910245071885,
+    "lambda": 1.2459502221396892,
+    "sigma": 5.812350682293095
   },
   {
     "item_id": "ownership_item1",
     "dimension_id": "ownership",
-    "nu": 24.60047872434405,
-    "lambda": 1.2999930470816363,
-    "sigma": 15.475096850982352
+    "nu": 26.570679939759184,
+    "lambda": 0.5708750203978616,
+    "sigma": 5.642251451546866
   },
   {
     "item_id": "ownership_item2",
     "dimension_id": "ownership",
-    "nu": 49.18813357413484,
-    "lambda": 1.1680716904581314,
-    "sigma": 8.452422248321785
+    "nu": 39.193736598563675,
+    "lambda": 0.7193666634795736,
+    "sigma": 5.345739659579079
   },
   {
     "item_id": "ownership_item3",
     "dimension_id": "ownership",
-    "nu": 72.91129625133647,
-    "lambda": 1.2085291287261537,
-    "sigma": 5.687134368152651
+    "nu": 69.41869555813005,
+    "lambda": 1.2138766325045411,
+    "sigma": 5.334874854447536
   },
   {
     "item_id": "ownership_item4",
     "dimension_id": "ownership",
-    "nu": 38.16570453202815,
-    "lambda": 1.305852334790675,
-    "sigma": 6.931325433200181
+    "nu": 51.52917184206527,
+    "lambda": 0.5829486785331612,
+    "sigma": 5.191580583073733
   },
   {
     "item_id": "ownership_item5",
     "dimension_id": "ownership",
-    "nu": 62.757567808452166,
-    "lambda": 1.453637133166294,
-    "sigma": 14.85419390033164
+    "nu": 60.467907581134234,
+    "lambda": 1.4634140622306653,
+    "sigma": 17.440666123156596
   },
   {
     "item_id": "fokus_item1",
     "dimension_id": "fokus",
-    "nu": 72.05753901809197,
-    "lambda": 1.272430523519527,
-    "sigma": 15.819344711507913
+    "nu": 37.54816894908944,
+    "lambda": 1.4269779955209267,
+    "sigma": 7.06541577301787
   },
   {
     "item_id": "fokus_item2",
     "dimension_id": "fokus",
-    "nu": 49.22953068127526,
-    "lambda": 1.4273957306136276,
-    "sigma": 5.940161114400289
+    "nu": 73.49392672292369,
+    "lambda": 1.4665941874333184,
+    "sigma": 8.806450282066344
   },
   {
     "item_id": "fokus_item3",
     "dimension_id": "fokus",
-    "nu": 24.644558542884276,
-    "lambda": 0.552005874921116,
-    "sigma": 8.77466964043036
+    "nu": 24.89007646055165,
+    "lambda": 1.2976681098516898,
+    "sigma": 16.828398675158493
   },
   {
     "item_id": "fokus_item4",
     "dimension_id": "fokus",
-    "nu": 63.692598091753084,
-    "lambda": 1.444332795604562,
-    "sigma": 8.169253681492235
+    "nu": 63.75957009109509,
+    "lambda": 1.4634109745442154,
+    "sigma": 5.563087751423575
   },
   {
     "item_id": "fokus_item5",
     "dimension_id": "fokus",
-    "nu": 38.37211156559938,
-    "lambda": 1.2145810494082558,
-    "sigma": 7.363270508750253
+    "nu": 51.53144767425384,
+    "lambda": 1.309478833519028,
+    "sigma": 5.207408010148631
   },
   {
     "item_id": "konsequenz_item1",
     "dimension_id": "konsequenz",
-    "nu": 39.05140635258928,
-    "lambda": 1.2912059576260935,
-    "sigma": 17.386589893698492
+    "nu": 60.86251319169188,
+    "lambda": 1.44384496572078,
+    "sigma": 6.126428852965558
   },
   {
     "item_id": "konsequenz_item2",
     "dimension_id": "konsequenz",
-    "nu": 24.777505017605122,
-    "lambda": 1.1906458938552027,
-    "sigma": 6.747718082283407
+    "nu": 25.49215518414807,
+    "lambda": 1.2648285498840854,
+    "sigma": 8.31439621960366
   },
   {
     "item_id": "konsequenz_item3",
     "dimension_id": "konsequenz",
-    "nu": 49.64851539540075,
-    "lambda": 0.71968989271398,
-    "sigma": 5.489269938474533
+    "nu": 49.79876460936194,
+    "lambda": 1.4493959858710221,
+    "sigma": 7.572138959248449
   },
   {
     "item_id": "konsequenz_item4",
     "dimension_id": "konsequenz",
-    "nu": 74.16233852216034,
-    "lambda": 1.341432705638509,
-    "sigma": 17.371739530436347
+    "nu": 74.93515408032523,
+    "lambda": 0.6053379160825358,
+    "sigma": 6.586846811664276
   },
   {
     "item_id": "konsequenz_item5",
     "dimension_id": "konsequenz",
-    "nu": 61.66564724886645,
-    "lambda": 1.4234082210968968,
-    "sigma": 5.633359649453576
+    "nu": 41.75179270470594,
+    "lambda": 1.2784701159836263,
+    "sigma": 5.7473860284057405
   }
 ]

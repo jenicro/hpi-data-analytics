@@ -14,7 +14,7 @@ from src.org_config import (
     DivisionSpec,
     DepartmentSpec,
     get_suggested_config,
-    get_suggested_explicit_config,
+    get_random_explicit_config,
 )
 from src.org_generator import generate_hierarchy, hierarchy_to_tree, summary, get_teams
 from src.latent_config import LatentGenConfig, get_suggested_latent_config
@@ -34,7 +34,7 @@ from src.items import (
     irt_scores_from_response_dataset,
     simulate_item_responses_from_org,
 )
-from src.dimensions import DIMENSION_IDS
+from src.dimensions import DIMENSION_IDS, DOMAINS, dimension_index
 from src.efa_utils import (
     true_thetas_and_correlation_from_response_dataset,
     get_efa_factor_scores,
@@ -91,87 +91,76 @@ if "item_response_dataset" not in st.session_state:
     st.session_state.item_response_dataset = None
 
 
-def apply_suggest_counts():
-    st.session_state.config = get_suggested_config()
-    st.session_state.nodes = generate_hierarchy(st.session_state.config)
+def apply_quick_generate(n_div, dept_min, dept_max, teams_min, teams_max, team_size_min, team_size_max, company_name, seed):
+    """Build random structure from min–max ranges and generate hierarchy."""
+    rng = np.random.default_rng(seed if seed else None)
+    dept_min, dept_max = max(1, dept_min), max(dept_min, dept_max)
+    teams_min, teams_max = max(1, teams_min), max(teams_min, teams_max)
+    team_size_min, team_size_max = max(1, team_size_min), max(team_size_min, team_size_max)
+    n_depts_per_div = [int(rng.integers(dept_min, dept_max + 1)) for _ in range(n_div)]
+    total_depts = sum(n_depts_per_div)
+    n_teams_per_dept = [int(rng.integers(teams_min, teams_max + 1)) for _ in range(total_depts)]
+    st.session_state.config = HierarchyConfig(
+        use_explicit=False,
+        counts=CountsConfig(
+            n_divisions=n_div,
+            n_departments_per_division=n_depts_per_div,
+            n_teams_per_department=n_teams_per_dept,
+            n_employees_per_team=(team_size_min + team_size_max) // 2,
+            n_employees_per_team_min=team_size_min,
+            n_employees_per_team_max=team_size_max,
+            company_name=company_name,
+            division_name_prefix="Division",
+            department_name_prefix="Dept",
+            team_name_prefix="Team",
+            employee_name_prefix="Employee",
+        ),
+    )
+    st.session_state.nodes = generate_hierarchy(st.session_state.config, rng=rng)
 
 
-def apply_suggest_explicit():
-    st.session_state.config = get_suggested_explicit_config()
-    st.session_state.nodes = generate_hierarchy(st.session_state.config)
+def apply_quick_generate_with_names(n_div, dept_min, dept_max, teams_min, teams_max, team_size_min, team_size_max, company_name, seed):
+    """Build random structure with division/department names from catalogue."""
+    rng = np.random.default_rng(seed if seed else None)
+    st.session_state.config = get_random_explicit_config(
+        n_divisions=n_div,
+        n_departments_per_division_min=max(1, dept_min),
+        n_departments_per_division_max=max(dept_min, dept_max),
+        n_teams_per_department_min=max(1, teams_min),
+        n_teams_per_department_max=max(teams_min, teams_max),
+        team_size_min=max(1, team_size_min),
+        team_size_max=max(team_size_min, team_size_max),
+        company_name=company_name,
+        rng=rng,
+        seed=seed,
+    )
+    st.session_state.nodes = generate_hierarchy(st.session_state.config, rng=rng)
 
 
 with st.sidebar:
     st.header("Config")
     st.subheader("Quick start")
-    if st.button("Use suggested (counts)", use_container_width=True):
-        apply_suggest_counts()
-        try:
-            st.rerun()
-        except Exception:
-            st.experimental_rerun()
-    if st.button("Use suggested (explicit names)", use_container_width=True):
-        apply_suggest_explicit()
-        try:
-            st.rerun()
-        except Exception:
-            st.experimental_rerun()
-
-    st.divider()
-    st.subheader("Mode")
-    use_explicit = st.radio("Structure", ["Counts (N per level)", "Explicit (names from organigram)"], key="mode")
-    use_explicit = use_explicit.startswith("Explicit")
-
-    if use_explicit:
-        st.info("Explicit tree: edit in code or load from YAML/JSON. For now use 'Use suggested (explicit names)' then regenerate after adding config loader.")
-        # Show current explicit summary if any
-        if st.session_state.config.use_explicit and st.session_state.config.explicit.divisions:
-            st.write("**Current:**", len(st.session_state.config.explicit.divisions), "divisions")
-    else:
-        c = st.session_state.config.counts
-        st.subheader("Counts")
-        n_div = st.number_input("Number of divisions", min_value=1, max_value=20, value=c.n_divisions, key="n_div")
-        dept_mode = st.radio("Departments", ["Same for all divisions", "One number per division (comma-separated)"], key="dept_mode")
-        if dept_mode.startswith("Same"):
-            n_dept = st.number_input("Departments per division", min_value=1, max_value=30, value=6, key="n_dept")
-            n_departments_per_division = n_dept
+    # Defaults = former "suggested" style (6 divs, 3–6 depts, 2–6 teams, 4–12 team size)
+    n_div = st.number_input("Number of divisions", min_value=1, max_value=20, value=6, key="qs_n_div")
+    dept_min = st.number_input("Departments per division (min)", min_value=1, max_value=15, value=3, key="qs_dept_min")
+    dept_max = st.number_input("Departments per division (max)", min_value=1, max_value=15, value=6, key="qs_dept_max")
+    teams_min = st.number_input("Teams per department (min)", min_value=1, max_value=20, value=2, key="qs_teams_min")
+    teams_max = st.number_input("Teams per department (max)", min_value=1, max_value=20, value=6, key="qs_teams_max")
+    team_size_min = st.number_input("Team size (min)", min_value=1, max_value=50, value=4, key="qs_team_min")
+    team_size_max = st.number_input("Team size (max)", min_value=1, max_value=50, value=12, key="qs_team_max")
+    st.caption(f"**Average team size:** {(team_size_min + team_size_max) / 2:.1f}")
+    use_names = st.checkbox("Use names from catalogue", value=True, key="qs_use_names", help="Division and department names from a realistic catalogue (e.g. Production, R&D, Body Shop, Marketing). Uncheck for Division 1, Dept 1.1, …")
+    company_name = st.text_input("Company name", value="AutoCorp", key="qs_company")
+    seed = st.number_input("Random seed (0 = new each time)", min_value=0, value=0, key="qs_seed")
+    if st.button("Generate", type="primary", use_container_width=True, key="qs_generate"):
+        if use_names:
+            apply_quick_generate_with_names(n_div, dept_min, dept_max, teams_min, teams_max, team_size_min, team_size_max, company_name, seed if seed else None)
         else:
-            dept_str = st.text_input("Departments per division (e.g. 8,6,10,5,4,6)", value="8,6,10,5,4,6", key="dept_txt")
-            try:
-                n_departments_per_division = [int(x.strip()) for x in dept_str.split(",") if x.strip()]
-                if len(n_departments_per_division) != n_div:
-                    st.warning(f"Expected {n_div} numbers; got {len(n_departments_per_division)}. Will pad or truncate.")
-            except ValueError:
-                n_departments_per_division = [6] * n_div
-                st.warning("Invalid input; using 6 per division.")
-        n_team = st.number_input("Teams per department", min_value=1, max_value=20, value=c.n_teams_per_department if isinstance(c.n_teams_per_department, int) else 5, key="n_team")
-        n_emp = st.number_input("Employees per team", min_value=1, max_value=50, value=c.n_employees_per_team if isinstance(c.n_employees_per_team, int) else 8, key="n_emp")
-        company_name = st.text_input("Company name", value=c.company_name, key="company")
-        div_prefix = st.text_input("Division name prefix", value=c.division_name_prefix, key="div_pfx")
-        dept_prefix = st.text_input("Department name prefix", value=c.department_name_prefix, key="dept_pfx")
-        team_prefix = st.text_input("Team name prefix", value=c.team_name_prefix, key="team_pfx")
-        emp_prefix = st.text_input("Employee name prefix", value=getattr(c, "employee_name_prefix", "Employee"), key="emp_pfx")
-
-        if st.button("Apply counts and generate", use_container_width=True):
-            st.session_state.config = HierarchyConfig(
-                use_explicit=False,
-                counts=CountsConfig(
-                    n_divisions=n_div,
-                    n_departments_per_division=n_departments_per_division,
-                    n_teams_per_department=n_team,
-                    n_employees_per_team=n_emp,
-                    company_name=company_name,
-                    division_name_prefix=div_prefix,
-                    department_name_prefix=dept_prefix,
-                    team_name_prefix=team_prefix,
-                    employee_name_prefix=emp_prefix,
-                ),
-            )
-            st.session_state.nodes = generate_hierarchy(st.session_state.config)
-            try:
-                st.rerun()
-            except Exception:
-                st.experimental_rerun()
+            apply_quick_generate(n_div, dept_min, dept_max, teams_min, teams_max, team_size_min, team_size_max, company_name, seed if seed else None)
+        try:
+            st.rerun()
+        except Exception:
+            st.experimental_rerun()
 
     st.divider()
     st.subheader("Download all datasets")
@@ -186,15 +175,9 @@ with st.sidebar:
     else:
         st.caption("Generate org (and optionally latents, item bank, item responses) to enable download.")
 
-# Generate if we have counts and no nodes yet
-if not st.session_state.config.use_explicit and not st.session_state.nodes:
-    st.session_state.nodes = generate_hierarchy(st.session_state.config)
-elif st.session_state.config.use_explicit and not st.session_state.nodes:
-    st.session_state.nodes = generate_hierarchy(st.session_state.config)
-
 nodes = st.session_state.nodes
 if not nodes:
-    st.warning("No hierarchy generated. Use a suggestion or set counts and click Apply.")
+    st.warning("No hierarchy generated. Set parameters in the sidebar and click **Generate**.")
     st.stop()
 
 tab_org, tab_latent, tab_explore, tab_items = st.tabs(["Org hierarchy", "Latent scores", "Explore", "Items / IRT"])
@@ -208,6 +191,60 @@ with tab_org:
     col3.metric("Departments", counts.get("department", 0))
     col4.metric("Teams", counts.get("team", 0))
     col5.metric("Employees", counts.get("employee", 0))
+
+    # Adjust structure (explicit only): edit names/counts then regenerate
+    if st.session_state.config.use_explicit and st.session_state.config.explicit.divisions:
+        st.subheader("Adjust structure")
+        st.caption("Edit division/department names, number of teams, and team size (min–max). Then regenerate.")
+        explicit = st.session_state.config.explicit
+        with st.form("adjust_explicit_form"):
+            company_adj = st.text_input("Company name", value=explicit.company_name, key="adj_company")
+            div_names_adj = []
+            dept_names_adj = []
+            n_teams_adj = []
+            tmin_adj = []
+            tmax_adj = []
+            for i, div in enumerate(explicit.divisions):
+                with st.expander(f"Division: {div.name}", expanded=(i < 2)):
+                    div_names_adj.append(st.text_input("Division name", value=div.name, key=f"adj_div_name_{i}"))
+                    for j, dept in enumerate(div.departments):
+                        c1, c2, c3, c4 = st.columns(4)
+                        with c1:
+                            dept_names_adj.append(st.text_input("Department", value=dept.name, key=f"adj_dept_name_{i}_{j}"))
+                        with c2:
+                            n_teams_adj.append(st.number_input("Teams", min_value=1, max_value=50, value=dept.n_teams, key=f"adj_n_teams_{i}_{j}"))
+                        tmin = getattr(dept, "n_employees_per_team_min", None) or dept.n_employees_per_team
+                        tmax = getattr(dept, "n_employees_per_team_max", None) or dept.n_employees_per_team
+                        with c3:
+                            tmin_adj.append(st.number_input("Team size min", 1, 50, value=int(tmin), key=f"adj_tmin_{i}_{j}"))
+                        with c4:
+                            tmax_adj.append(st.number_input("Team size max", 1, 50, value=int(tmax), key=f"adj_tmax_{i}_{j}"))
+            if st.form_submit_button("Regenerate from this structure"):
+                new_divisions = []
+                flat = 0
+                for i, div in enumerate(explicit.divisions):
+                    depts = []
+                    for j in range(len(div.departments)):
+                        idx = flat + j
+                        depts.append(DepartmentSpec(
+                            name=dept_names_adj[idx],
+                            n_teams=int(n_teams_adj[idx]),
+                            n_employees_per_team=(tmin_adj[idx] + tmax_adj[idx]) // 2,
+                            n_employees_per_team_min=tmin_adj[idx],
+                            n_employees_per_team_max=tmax_adj[idx],
+                        ))
+                    flat += len(div.departments)
+                    new_divisions.append(DivisionSpec(name=div_names_adj[i], departments=depts))
+                st.session_state.config = HierarchyConfig(
+                    use_explicit=True,
+                    explicit=ExplicitConfig(company_name=company_adj, divisions=new_divisions),
+                )
+                rng = np.random.default_rng()
+                st.session_state.nodes = generate_hierarchy(st.session_state.config, rng=rng)
+                try:
+                    st.rerun()
+                except Exception:
+                    st.experimental_rerun()
 
     st.subheader("Tree preview")
     tree = hierarchy_to_tree(nodes)
@@ -254,11 +291,41 @@ with tab_latent:
             st.session_state.latent_config = get_suggested_latent_config()
         cfg = st.session_state.latent_config
         with st.expander("Latent generation parameters (optional)", expanded=False):
-            mu_val = st.number_input("Population mean (all 15 dims)", min_value=0.0, max_value=100.0, value=float(cfg.mu[0]) if cfg.mu else 50.0, key="lat_mu", help="50 keeps item responses balanced (no skew to 0 or 100).")
-            st.session_state.latent_config.mu = [mu_val] * 15
+            st.markdown("**Population mean per dimension (0–100)**")
+            st.caption("Set the mean for each of the 15 culture dimensions. Use **Randomize means** below to draw all 15 around a global mean, or edit individually.")
+            r1, r2, r3 = st.columns([1, 1, 1])
+            with r1:
+                global_mean = st.number_input("Global mean", min_value=0.0, max_value=100.0, value=50.0, key="lat_global_mean", help="Target mean over all 15 dimensions when randomizing")
+            with r2:
+                mu_spread = st.number_input("Spread (SD around global)", min_value=0.0, max_value=25.0, value=8.0, key="lat_mu_spread", help="How much each dimension mean varies around the global mean (0 = all equal)")
+            with r3:
+                st.write("")
+                st.write("")
+                if st.button("Randomize means", key="lat_randomize_mu"):
+                    rng_mu = np.random.default_rng()
+                    mu_new = np.clip(global_mean + rng_mu.normal(0, mu_spread, 15), 0.0, 100.0)
+                    st.session_state.latent_config.mu = mu_new.tolist()
+                    st.session_state["lat_mu_revision"] = st.session_state.get("lat_mu_revision", 0) + 1
+                    try:
+                        st.rerun()
+                    except Exception:
+                        st.experimental_rerun()
+            mu_rev = st.session_state.get("lat_mu_revision", 0)
+            mu_list = []
+            mu_cols = st.columns(5)
+            for col_idx, (domain_name, dims) in enumerate(DOMAINS):
+                with mu_cols[col_idx]:
+                    st.caption(f"**{domain_name}**")
+                    for dim_id, dim_name in dims:
+                        idx = dimension_index(dim_id)
+                        current = float(cfg.mu[idx]) if cfg.mu and idx < len(cfg.mu) else 50.0
+                        val = st.number_input(dim_name, min_value=0.0, max_value=100.0, value=current, key=f"lat_mu_{idx}_{mu_rev}", format="%.1f")
+                        mu_list.append(val)
+            st.session_state.latent_config.mu = mu_list
             st.markdown("**Correlation structure (15 dimensions)**")
-            r_within = st.slider("Within-domain correlation", 0.0, 0.95, float(cfg.r_within_domain), key="lat_rw", help="Correlation between dimensions in the same domain (e.g. Zuversicht, Richtung, Energie)")
-            r_cross = st.slider("Cross-domain correlation", 0.0, 0.95, float(cfg.r_cross_domain), key="lat_rb", help="Correlation between dimensions in different domains")
+            st.caption("**True correlation in the entire population.** Data from a single company or sample will look more random (weaker observed correlations).")
+            r_within = st.slider("Within-domain correlation", 0.0, 0.95, float(cfg.r_within_domain), key="lat_rw", help="True population correlation between dimensions in the same domain (e.g. Zuversicht, Richtung, Energie)")
+            r_cross = st.slider("Cross-domain correlation", 0.0, 0.95, float(cfg.r_cross_domain), key="lat_rb", help="True population correlation between dimensions in different domains")
             st.session_state.latent_config.r_within_domain = r_within
             st.session_state.latent_config.r_cross_domain = r_cross
             st.markdown("**Variance partition (measurement / individual / team / department / division)**")

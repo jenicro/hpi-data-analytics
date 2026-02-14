@@ -492,32 +492,25 @@ with tab_overview:
             angles_super = np.linspace(0, 360, n_super, endpoint=False)  # 0, 72, 144, 216, 288
             angles_sub = np.linspace(0, 360, n_sub, endpoint=False)     # 24° each
 
-            def _wedge_traces(means, angles_deg, colors, descriptions=None):
-                """One filled wedge per axis: (center, value, next center). Returns list of traces."""
-                traces = []
-                n = len(means)
-                for k in range(n):
-                    th0, th1 = angles_deg[k], angles_deg[(k + 1) % n]
-                    r_wedge = [0, float(means[k]), 0]
-                    theta_wedge = [th0, th0, th1]
-                    color = colors[k % len(colors)]
-                    desc = (descriptions[k] if descriptions and k < len(descriptions) else "") or ""
-                    tr = go.Scatterpolar(
-                        r=r_wedge,
-                        theta=theta_wedge,
-                        fill="toself",
-                        fillcolor=color,
-                        line=dict(color=color, width=1.5),
-                        name=str(k),
-                        showlegend=False,
-                    )
-                    if desc:
-                        tr.update(customdata=[[desc, desc, desc]], hovertemplate="Score: %{r:.1f}<br><br>%{customdata[0]}<extra></extra>")
-                    traces.append(tr)
-                return traces
+            def _contour_trace(r_values, theta_deg, line_color, fill_color, name, descriptions=None):
+                """One closed polygon contour (no wedges from center). r and theta closed (first point repeated)."""
+                r = list(r_values) + [float(r_values[0])]
+                theta = list(theta_deg) + [theta_deg[0]]
+                tr = go.Scatterpolar(
+                    r=r,
+                    theta=theta,
+                    fill="toself",
+                    fillcolor=fill_color,
+                    line=dict(color=line_color, width=2),
+                    name=name,
+                )
+                if descriptions is not None:
+                    customdata = [descriptions[k % len(descriptions)] for k in range(len(r_values))] + [descriptions[0]]
+                    tr.update(customdata=customdata, hovertemplate="Score: %{r:.1f}<br><br>%{customdata}<extra></extra>")
+                return tr
 
             col_spider_super, col_spider_sub = st.columns(2)
-            # ---- Super-dimension spider (5 axes, colored wedges + icons) ----
+            # ---- Super-dimension spider (5 axes): contour polygon + icons ----
             fig_super_spider = go.Figure()
             # Neutral reference (single gray polygon)
             r_neutral = [50] * (n_super + 1)
@@ -550,8 +543,13 @@ with tab_overview:
                     name="95% CrI",
                 ))
             super_descriptions = [get_super_description(k) for k in range(5)]
-            for tr in _wedge_traces(mean_super, angles_super, domain_colors, super_descriptions):
-                fig_super_spider.add_trace(tr)
+            fig_super_spider.add_trace(_contour_trace(
+                mean_super, angles_super,
+                line_color="#2d7d7d",
+                fill_color="rgba(45, 125, 125, 0.25)",
+                name="Scores",
+                descriptions=super_descriptions,
+            ))
             fig_super_spider.update_layout(
                 polar=dict(
                     radialaxis=dict(visible=True, range=[0, 100], tickfont=dict(size=10)),
@@ -590,8 +588,7 @@ with tab_overview:
             with col_spider_super:
                 st.caption("**5 super-dimensions** (icons at each axis)")
                 st.plotly_chart(fig_super_spider, use_container_width=True)
-            # ---- Sub-dimension spider (15 axes, color-grouped by super) ----
-            sub_colors_spider = [domain_colors[i // 3] for i in range(15)]
+            # ---- Sub-dimension spider (15 axes): contour polygon ----
             fig_sub_spider = go.Figure()
             r_neutral_sub = [50] * (n_sub + 1)
             theta_neutral_sub = list(angles_sub) + [angles_sub[0]]
@@ -622,8 +619,13 @@ with tab_overview:
                     name="95% CrI",
                 ))
             sub_descriptions = [get_sub_description(j) for j in range(15)]
-            for tr in _wedge_traces(mean_sub, angles_sub, sub_colors_spider, sub_descriptions):
-                fig_sub_spider.add_trace(tr)
+            fig_sub_spider.add_trace(_contour_trace(
+                mean_sub, angles_sub,
+                line_color="#2d7d7d",
+                fill_color="rgba(45, 125, 125, 0.2)",
+                name="Scores",
+                descriptions=sub_descriptions,
+            ))
             fig_sub_spider.update_layout(
                 polar=dict(
                     radialaxis=dict(visible=True, range=[0, 100], tickfont=dict(size=9)),
@@ -861,14 +863,19 @@ with tab_overview:
         )
         sunburst_labels = ["Organization"] + [_name_drill(i) for i in sunburst_ids[1:]]
         if _pending is not None and _pending in _all_ids:
+            # All selector keys (we'll set only what the target level needs)
+            _all_sel_keys = (
+                "overview_sel_division", "overview_sel_div_dept", "overview_sel_dept",
+                "overview_sel_div_team", "overview_sel_dept_team", "overview_sel_team",
+            )
             if _pending == "org":
                 st.session_state["overview_drill_level"] = "Organization"
-                # Clear selector indices so no stale division/dept/team selection
-                for key in ("overview_sel_division", "overview_sel_div_dept", "overview_sel_dept",
-                            "overview_sel_div_team", "overview_sel_dept_team", "overview_sel_team"):
+                for key in _all_sel_keys:
                     st.session_state.pop(key, None)
             elif _pending in div_ids_drill:
                 st.session_state["overview_drill_level"] = "Division"
+                for key in _all_sel_keys:
+                    st.session_state.pop(key, None)
                 st.session_state["overview_sel_division"] = div_ids_drill.index(_pending)
             else:
                 dept_id_to_div = {}
@@ -879,6 +886,8 @@ with tab_overview:
                     _div_sel = dept_id_to_div[_pending]
                     _dept_list = division_to_depts_drill.get(_div_sel) or []
                     st.session_state["overview_drill_level"] = "Department"
+                    for key in _all_sel_keys:
+                        st.session_state.pop(key, None)
                     st.session_state["overview_sel_div_dept"] = div_ids_drill.index(_div_sel)
                     st.session_state["overview_sel_dept"] = _dept_list.index(_pending)
                 else:
@@ -888,6 +897,8 @@ with tab_overview:
                                 _dept_list_t = division_to_depts_drill.get(_div) or []
                                 _team_list_t = dept_to_teams_drill.get(dept) or []
                                 st.session_state["overview_drill_level"] = "Team"
+                                for key in _all_sel_keys:
+                                    st.session_state.pop(key, None)
                                 st.session_state["overview_sel_div_team"] = div_ids_drill.index(_div)
                                 st.session_state["overview_sel_dept_team"] = _dept_list_t.index(dept)
                                 st.session_state["overview_sel_team"] = _team_list_t.index(_pending)
@@ -936,6 +947,25 @@ with tab_overview:
             else:
                 st.info("No departments in this division.")
 
+        # Back button: go up one level when drilled to Division / Department / Team
+        if level_ov != "Organization" and (sel_div_ov or sel_dept_ov or sel_team_ov):
+            if level_ov == "Team" and sel_dept_ov:
+                back_target = "Department"
+                back_id = sel_dept_ov
+            elif level_ov == "Department" and sel_div_ov:
+                back_target = "Division"
+                back_id = sel_div_ov
+            elif level_ov == "Division":
+                back_target = "Organization"
+                back_id = "org"
+            else:
+                back_target = None
+                back_id = None
+            if back_id is not None:
+                if st.button(f"← Back to {back_target}", key="sunburst_back_btn"):
+                    st.session_state["_sunburst_pending_id"] = back_id
+                    st.rerun()
+
         # Current unit id for Sunburst level (so the chart zooms to the selector's choice)
         sunburst_level_id = ""
         if level_ov == "Division" and sel_div_ov:
@@ -953,25 +983,35 @@ with tab_overview:
                 tuple(sunburst_labels),
                 tuple(sunburst_parents),
             )
-            clicked_id = sunburst_select(plot_json=fig_sunburst_json, key="org_sunburst_select", height=380)
-            # Store click and rerun so next run applies it before widgets are created.
-            # Ignore repeated stale click payloads from component reruns.
-            if clicked_id is None:
-                st.session_state.pop("_sunburst_last_clicked_id", None)
-            elif clicked_id in sunburst_ids and not _applied_sunburst_pending:
-                last_clicked = st.session_state.get("_sunburst_last_clicked_id")
-                if clicked_id != last_clicked:
-                    st.session_state["_sunburst_last_clicked_id"] = clicked_id
-                    # Click on center (current root) = go back one level
+            clicked_id, click_seq = sunburst_select(plot_json=fig_sunburst_json, key="org_sunburst_select", height=380)
+            # Resolve label to id if Plotly sent the display name (e.g. "Team 6") instead of id
+            if clicked_id is not None and clicked_id not in sunburst_ids and sunburst_labels:
+                for i, lbl in enumerate(sunburst_labels):
+                    if i < len(sunburst_ids) and lbl == clicked_id:
+                        clicked_id = sunburst_ids[i]
+                        break
+            # Dedupe via click sequence number. The component increments seq on every
+            # genuine user click; on reruns (CI toggle, etc.) seq stays the same.
+            # This is what prevents stale re-processing — no more id-based guessing.
+            if clicked_id is not None and clicked_id in sunburst_ids:
+                last_seq = st.session_state.get("_sunburst_last_click_seq")
+                if click_seq != last_seq and not _applied_sunburst_pending:
+                    st.session_state["_sunburst_last_click_seq"] = click_seq
+                    # Determine navigation target
+                    nav_target = clicked_id
                     if clicked_id == sunburst_level_id:
+                        # Click on current level = go back to parent
                         idx_cur = sunburst_ids.index(sunburst_level_id)
-                        parent_id = sunburst_parents[idx_cur] if idx_cur < len(sunburst_parents) else ""
-                        if parent_id:  # not at top
-                            st.session_state["_sunburst_pending_id"] = parent_id
-                            st.rerun()
-                    else:
-                        st.session_state["_sunburst_pending_id"] = clicked_id
+                        nav_target = sunburst_parents[idx_cur] if idx_cur < len(sunburst_parents) else ""
+                    # Queue the navigation and rerun so widgets + sunburst + charts
+                    # all update together from the pending-apply block at the top.
+                    if nav_target and nav_target in _all_ids:
+                        st.session_state["_sunburst_pending_id"] = nav_target
                         st.rerun()
+                elif _applied_sunburst_pending:
+                    # We just applied a pending — update the seq guard so we don't
+                    # re-process this same click on the next rerun.
+                    st.session_state["_sunburst_last_click_seq"] = click_seq
 
         # Show which unit the dashboard is scoped to (scores and charts below are for this unit)
         if level_ov == "Organization":
@@ -1064,7 +1104,7 @@ with tab_overview:
             view_scores_d = st.radio("Show as", ["Bar charts", "Spider"], horizontal=True, key="overview_drill_scores_as")
             if view_scores_d == "Bar charts":
                 if "overview_drill_show_cri_bars" not in st.session_state:
-                    st.session_state["overview_drill_show_cri_bars"] = True
+                    st.session_state["overview_drill_show_cri_bars"] = False
                 show_cri_bars_d = st.checkbox("Show 95% credibility intervals in bar charts", key="overview_drill_show_cri_bars")
                 sub_colors_d = [domain_colors[i // 3] for i in range(15)]
                 sep_label_d = " "

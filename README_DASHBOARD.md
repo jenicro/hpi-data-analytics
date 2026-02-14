@@ -11,7 +11,25 @@ pip install -r requirements.txt
 streamlit run app_dashboard.py
 ```
 
-The app loads `dashboard_input/culture_results.json` if present, otherwise `dashboard_input/culture_results_sample.json` (minimal sample so it runs out of the box).
+Which dataset is loaded is set in **`dashboard_input/dashboard_config.json`**:
+- `"data_file": "culture_results_sample.json"` → sample data (what the deployed branch uses).
+- `"data_file": "culture_results.json"` → your full results.
+
+If the config file is missing, the app uses `culture_results.json` if present, else `culture_results_sample.json`.
+
+## Host on Hugging Face Spaces
+
+1. **Create a token:** Hugging Face → Settings → Access Tokens → New token (read + write).
+2. **Store the token (HF only, does not touch GitHub):**  
+   Open `C:\Users\jenic\.git-credentials-huggingface` and replace `PASTE_YOUR_TOKEN_HERE` with your token, then save. Git is configured to use this file only for `huggingface.co`.
+3. **Push this branch to your Space:**
+   ```bash
+   git checkout host_dashboard
+   git remote add hf https://huggingface.co/spaces/cromi/dashboard
+   # If "remote hf already exists": git remote set-url hf https://huggingface.co/spaces/cromi/dashboard
+   git push hf host_dashboard:main --force
+   ```
+4. Wait for the Space to rebuild; open https://huggingface.co/spaces/cromi/dashboard
 
 ## Host (e.g. Streamlit Community Cloud)
 

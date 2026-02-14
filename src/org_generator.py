@@ -23,7 +23,7 @@ def _node_id(level: str, *parts: int) -> str:
     return "_".join([level] + [str(p) for p in parts])
 
 
-def _generate_from_counts(c: CountsConfig) -> List[Dict[str, Any]]:
+def _generate_from_counts(c: CountsConfig, rng: Optional[Any] = None) -> List[Dict[str, Any]]:
     nodes: List[Dict[str, Any]] = []
     company_id = _node_id("company", 0)
     nodes.append({
@@ -36,7 +36,14 @@ def _generate_from_counts(c: CountsConfig) -> List[Dict[str, Any]]:
 
     depts_per_div = c.get_departments_per_division()
     teams_per_dept = c.get_teams_per_department()
-    employees_per_team = c.get_employees_per_team()
+    use_team_size_range = (
+        getattr(c, "n_employees_per_team_min", None) is not None
+        and getattr(c, "n_employees_per_team_max", None) is not None
+        and rng is not None
+    )
+    team_min = getattr(c, "n_employees_per_team_min", 8)
+    team_max = getattr(c, "n_employees_per_team_max", 8)
+    employees_per_team = c.get_employees_per_team() if not use_team_size_range else None
     dept_flat_idx = 0
     team_flat_idx = 0
 
@@ -62,7 +69,10 @@ def _generate_from_counts(c: CountsConfig) -> List[Dict[str, Any]]:
             })
 
             for team_idx in range(n_teams):
-                n_employees = employees_per_team[team_flat_idx] if team_flat_idx < len(employees_per_team) else 8
+                if use_team_size_range:
+                    n_employees = int(rng.integers(team_min, team_max + 1))
+                else:
+                    n_employees = employees_per_team[team_flat_idx] if team_flat_idx < len(employees_per_team) else 8
                 team_id = _node_id("team", div_idx, dept_idx, team_idx)
                 nodes.append({
                     "id": team_id,
@@ -86,7 +96,7 @@ def _generate_from_counts(c: CountsConfig) -> List[Dict[str, Any]]:
     return nodes
 
 
-def _generate_from_explicit(e: ExplicitConfig) -> List[Dict[str, Any]]:
+def _generate_from_explicit(e: ExplicitConfig, rng: Optional[Any] = None) -> List[Dict[str, Any]]:
     nodes: List[Dict[str, Any]] = []
     company_id = _node_id("company", 0)
     nodes.append({
@@ -121,8 +131,18 @@ def _generate_from_explicit(e: ExplicitConfig) -> List[Dict[str, Any]]:
             names: Optional[List[str]] = dept.team_names
             if names:
                 n_teams = len(names)
-            n_employees = getattr(dept, "n_employees_per_team", 8)
+            use_min_max = (
+                getattr(dept, "n_employees_per_team_min", None) is not None
+                and getattr(dept, "n_employees_per_team_max", None) is not None
+            )
+            min_emp = getattr(dept, "n_employees_per_team_min", 8)
+            max_emp = getattr(dept, "n_employees_per_team_max", 8)
+            fixed_emp = getattr(dept, "n_employees_per_team", 8)
             for team_idx in range(n_teams):
+                if use_min_max and rng is not None:
+                    n_employees = int(rng.integers(min_emp, max_emp + 1))
+                else:
+                    n_employees = fixed_emp
                 team_id = _node_id("team", div_idx, dept_idx, team_idx)
                 team_name = (names[team_idx]) if names else f"Team {team_idx + 1}"
                 nodes.append({
@@ -145,14 +165,14 @@ def _generate_from_explicit(e: ExplicitConfig) -> List[Dict[str, Any]]:
     return nodes
 
 
-def generate_hierarchy(config: HierarchyConfig) -> List[Dict[str, Any]]:
+def generate_hierarchy(config: HierarchyConfig, rng: Optional[Any] = None) -> List[Dict[str, Any]]:
     """
     Generate flat list of org nodes from config.
     Each node: id, name, level (company|division|department|team), parent_id, level_index.
     """
     if config.use_explicit:
-        return _generate_from_explicit(config.explicit)
-    return _generate_from_counts(config.counts)
+        return _generate_from_explicit(config.explicit, rng=rng)
+    return _generate_from_counts(config.counts, rng=rng)
 
 
 def hierarchy_to_tree(nodes: List[Dict[str, Any]]) -> Dict[str, Any]:

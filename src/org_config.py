@@ -5,7 +5,7 @@ Supports: suggestion (large auto manufacturer), counts-based, or explicit tree.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import List, Union
+from typing import List, Optional, Union
 
 
 # ---------------------------------------------------------------------------
@@ -27,6 +27,10 @@ class CountsConfig:
 
     n_employees_per_team: Union[int, List[int]] = 8
     """Employees (individuals) per team. int = same for all; list = one value per team (flattened order)."""
+
+    n_employees_per_team_min: Optional[int] = None
+    """When set with max, each team size is drawn uniformly in [min, max] (requires rng in generator)."""
+    n_employees_per_team_max: Optional[int] = None
 
     company_name: str = "Company"
     division_name_prefix: str = "Division"
@@ -89,7 +93,10 @@ class DepartmentSpec:
     team_names: List[str] | None = None
     """If set, use these names and len(team_names) overrides n_teams."""
     n_employees_per_team: int = 8
-    """Number of employees (individuals) in each team in this department."""
+    """Number of employees (individuals) in each team when min/max not set."""
+    n_employees_per_team_min: Optional[int] = None
+    """When set with max, team size is drawn uniformly in [min, max] per team."""
+    n_employees_per_team_max: Optional[int] = None
 
 
 @dataclass
@@ -184,4 +191,90 @@ def get_suggested_explicit_config() -> HierarchyConfig:
                 ]),
             ],
         ),
+    )
+
+
+# ---------------------------------------------------------------------------
+# Name catalogue for random / editable org generation (realistic, varied, fun)
+# ---------------------------------------------------------------------------
+
+DIVISION_NAMES_CATALOGUE: List[str] = [
+    "Production", "R&D", "Sales & Marketing", "Procurement & Supply Chain", "HR & Organization", "Finance & IT",
+    "Operations", "Engineering", "Customer Success", "Product", "Legal & Compliance", "Strategy",
+    "Manufacturing", "Technology", "Commercial", "Supply Chain", "People & Culture", "Corporate Functions",
+    "Innovation", "Quality & Safety", "After Sales", "Digital", "Growth", "Global Markets",
+    "Regional Europe", "Regional Americas", "Regional Asia", "Shared Services", "Business Development",
+]
+
+DEPARTMENT_NAMES_CATALOGUE: List[str] = [
+    # Production / Manufacturing
+    "Body Shop", "Paint", "Assembly", "Powertrain", "Quality", "Vehicle Development", "E-Mobility",
+    "Testing", "Simulation", "Manufacturing", "Maintenance", "Safety", "Tooling", "Pre-Production",
+    "Final Assembly", "Stamping", "Welding", "Plastics", "Electronics Assembly", "Packaging",
+    # Sales & Marketing
+    "Sales Ops", "Marketing", "After Sales", "Digital Sales", "Key Account Management", "Channel Management",
+    "Brand", "Communications", "Customer Experience", "Market Research", "Pricing", "Trade Marketing",
+    "Retail", "Fleet Sales", "Online Sales", "Partner Management", "Lead Management",
+    # R&D / Engineering
+    "Vehicle Development", "E-Mobility", "Testing", "Simulation", "Innovation", "Advanced Engineering",
+    "Software", "Hardware", "Systems Engineering", "Prototyping", "Calibration", "NVH",
+    "Thermal", "Battery", "Chassis", "Interior", "Exterior", "Connectivity",
+    # Procurement / Supply Chain
+    "Purchasing", "Logistics", "Supplier Quality", "Sourcing", "Commodity Management", "Supply Planning",
+    "Warehouse", "Customs", "Transport", "Indirect Procurement", "Supplier Development", "Demand Planning",
+    # HR / People
+    "HR Business Partners", "Recruiting", "Learning", "Talent", "Compensation", "People Analytics",
+    "Employee Experience", "Diversity & Inclusion", "Labor Relations", "HR Operations", "Workforce Planning",
+    "Leadership Development", "Onboarding", "Mobility",
+    # Finance / IT / Legal
+    "Controlling", "IT", "Finance Ops", "Risk", "Audit", "Tax", "Treasury", "Reporting",
+    "Legal", "Compliance", "Data Protection", "Project Office", "Process Excellence",
+    "Infrastructure", "Applications", "Cybersecurity", "Business Intelligence", "Analytics",
+]
+
+
+def get_random_explicit_config(
+    n_divisions: int,
+    n_departments_per_division_min: int,
+    n_departments_per_division_max: int,
+    n_teams_per_department_min: int,
+    n_teams_per_department_max: int,
+    team_size_min: int,
+    team_size_max: int,
+    company_name: str = "Company",
+    rng=None,
+    seed: Optional[int] = None,
+) -> HierarchyConfig:
+    """
+    Build an explicit config by drawing from the name catalogue and random counts.
+    Uses rng (or numpy.random.default_rng(seed)) for reproducibility.
+    """
+    if rng is None:
+        import numpy as np
+        rng = np.random.default_rng(seed)
+    div_names = list(DIVISION_NAMES_CATALOGUE)
+    dept_names = list(DEPARTMENT_NAMES_CATALOGUE)
+    # Draw division names (with replacement if n_divisions > catalogue size)
+    div_pick = rng.choice(div_names, size=n_divisions, replace=True) if div_names else [f"Division {i+1}" for i in range(n_divisions)]
+    if hasattr(div_pick, "tolist"):
+        div_pick = div_pick.tolist()
+    divisions: List[DivisionSpec] = []
+    for i in range(n_divisions):
+        div_name = div_pick[i] if i < len(div_pick) else f"Division {i + 1}"
+        n_depts = int(rng.integers(n_departments_per_division_min, n_departments_per_division_max + 1))
+        departments = []
+        for j in range(n_depts):
+            name = str(rng.choice(dept_names)) if dept_names else f"Dept {j + 1}"
+            n_teams = int(rng.integers(n_teams_per_department_min, n_teams_per_department_max + 1))
+            departments.append(DepartmentSpec(
+                name=name,
+                n_teams=n_teams,
+                n_employees_per_team=(team_size_min + team_size_max) // 2,
+                n_employees_per_team_min=team_size_min,
+                n_employees_per_team_max=team_size_max,
+            ))
+        divisions.append(DivisionSpec(name=div_name, departments=departments))
+    return HierarchyConfig(
+        use_explicit=True,
+        explicit=ExplicitConfig(company_name=company_name, divisions=divisions),
     )

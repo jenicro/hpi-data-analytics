@@ -1,6 +1,7 @@
 """
 Streamlit component: Sunburst chart that sends the clicked slice id back to Python.
-Uses plotly_sunburstclick and prevents default zoom so the app receives the selection.
+Each click includes a monotonic sequence number so the app can distinguish new clicks
+from stale component values that Streamlit re-sends on every rerun.
 """
 import json
 import os
@@ -21,14 +22,14 @@ else:
 
 
 def sunburst_select(fig=None, plot_json=None, key=None, height=380):
-    """Render a Plotly Sunburst and return the id of the clicked slice (or None).
+    """Render a Plotly Sunburst and return (id, seq) of the clicked slice.
 
     Parameters
     ----------
     fig : plotly.graph_objects.Figure or None
         A Plotly figure containing a single Sunburst trace. Ignored if plot_json is set.
     plot_json : str or None
-        Pre-serialized figure JSON (avoids repeated to_json() and can match cache for fewer redraws).
+        Pre-serialized figure JSON.
     key : str or None
         Optional key for the component.
     height : int
@@ -36,9 +37,10 @@ def sunburst_select(fig=None, plot_json=None, key=None, height=380):
 
     Returns
     -------
-    str or None
-        The id of the clicked slice (same as the ids passed to the Sunburst trace),
-        or None if no click has been received yet.
+    tuple[str | None, int | None]
+        (id, seq) — the clicked slice id and a monotonic click counter.
+        seq changes only on genuine user clicks; it stays the same across reruns.
+        Returns (None, None) if no click has been received yet.
     """
     if plot_json is None and fig is not None:
         plot_json = fig.to_json()
@@ -49,13 +51,13 @@ def sunburst_select(fig=None, plot_json=None, key=None, height=380):
         default=None,
     )
     if raw is None:
-        return None
+        return None, None
     if isinstance(raw, str):
         try:
             data = json.loads(raw)
-            return data.get("id")
+            return data.get("id"), data.get("seq")
         except (json.JSONDecodeError, TypeError):
-            return None
+            return None, None
     if isinstance(raw, dict):
-        return raw.get("id")
-    return None
+        return raw.get("id"), raw.get("seq")
+    return None, None

@@ -1,5 +1,5 @@
 """
-One-off diagnostic: run with venv activated to see Python/Streamlit setup.
+One-off diagnostic: run with the project venv (C:\\venvs\\hpi-data-analytics) activated.
 Usage: python scripts/debug_streamlit.py
 """
 import sys
