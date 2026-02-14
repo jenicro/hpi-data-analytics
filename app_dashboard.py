@@ -1101,280 +1101,312 @@ with tab_overview:
             err_minus_sub_d = mean_sub_d - lo_sub_d
 
             st.subheader(f"Scores at a glance — {viewing_name}")
-            view_scores_d = st.radio("Show as", ["Bar charts", "Spider"], horizontal=True, key="overview_drill_scores_as")
-            if view_scores_d == "Bar charts":
-                if "overview_drill_show_cri_bars" not in st.session_state:
-                    st.session_state["overview_drill_show_cri_bars"] = False
-                show_cri_bars_d = st.checkbox("Show 95% credibility intervals in bar charts", key="overview_drill_show_cri_bars")
-                sub_colors_d = [domain_colors[i // 3] for i in range(15)]
-                sep_label_d = " "
-                all_y_d = list(short_labels) + [sep_label_d] + list(sub_names_15)
-                all_x_d = [float(x) for x in (list(mean_super_d) + [0] + list(mean_sub_d))]
-                all_colors_d = list(domain_colors) + ["rgba(0,0,0,0)"] + sub_colors_d
-                all_text_d = [f"{v:.1f}" for v in mean_super_d] + [""] + [f"{v:.1f}" for v in mean_sub_d]
-                cri_strs_d = (
-                    [f"{lo_super_d[i]:.1f}–{hi_super_d[i]:.1f}" for i in range(5)]
-                    + [""] + [f"{lo_sub_d[i]:.1f}–{hi_sub_d[i]:.1f}" for i in range(15)]
-                ) if show_cri_bars_d else [""] * 21
-                all_descriptions_d = [get_super_description(k) for k in range(5)] + [""] + [get_sub_description(j) for j in range(15)]
-                bar_customdata_d = [[cri_strs_d[i], all_descriptions_d[i]] for i in range(21)]
-                bar_kw_d = dict(
-                    y=all_y_d,
-                    x=all_x_d,
-                    orientation="h",
-                    marker_color=all_colors_d,
-                    text=all_text_d,
-                    textposition="outside",
-                    textfont=dict(size=10),
-                    hovertemplate="%{y}: %{x:.1f}" + (" (95%% CrI: %{customdata[0]})" if show_cri_bars_d else "") + "<br><br>%{customdata[1]}<extra></extra>",
-                    customdata=bar_customdata_d,
+            if "overview_drill_show_cri_bars" not in st.session_state:
+                st.session_state["overview_drill_show_cri_bars"] = False
+            show_cri_bars_d = st.checkbox("Show 95% credibility intervals in bar charts", key="overview_drill_show_cri_bars")
+            sub_colors_d = [domain_colors[i // 3] for i in range(15)]
+            sep_label_d = " "
+            all_y_d = list(short_labels) + [sep_label_d] + list(sub_names_15)
+            all_x_d = [float(x) for x in (list(mean_super_d) + [0] + list(mean_sub_d))]
+            all_colors_d = list(domain_colors) + ["rgba(0,0,0,0)"] + sub_colors_d
+            all_text_d = [f"{v:.1f}" for v in mean_super_d] + [""] + [f"{v:.1f}" for v in mean_sub_d]
+            cri_strs_d = (
+                [f"{lo_super_d[i]:.1f}–{hi_super_d[i]:.1f}" for i in range(5)]
+                + [""] + [f"{lo_sub_d[i]:.1f}–{hi_sub_d[i]:.1f}" for i in range(15)]
+            ) if show_cri_bars_d else [""] * 21
+            all_descriptions_d = [get_super_description(k) for k in range(5)] + [""] + [get_sub_description(j) for j in range(15)]
+            bar_customdata_d = [[cri_strs_d[i], all_descriptions_d[i]] for i in range(21)]
+            bar_kw_d = dict(
+                y=all_y_d,
+                x=all_x_d,
+                orientation="h",
+                marker_color=all_colors_d,
+                text=all_text_d,
+                textposition="outside",
+                textfont=dict(size=10),
+                hovertemplate="%{y}: %{x:.1f}" + (" (95%% CrI: %{customdata[0]})" if show_cri_bars_d else "") + "<br><br>%{customdata[1]}<extra></extra>",
+                customdata=bar_customdata_d,
+            )
+            if show_cri_bars_d:
+                err_plus = [float(x) for x in list(err_plus_super_d) + [0] + list(err_plus_sub_d)]
+                err_minus = [float(x) for x in list(err_minus_super_d) + [0] + list(err_minus_sub_d)]
+                bar_kw_d["error_x"] = dict(
+                    type="data",
+                    array=err_plus,
+                    arrayminus=err_minus,
+                    thickness=1.5,
+                    color="rgba(0,0,0,0.5)",
                 )
-                if show_cri_bars_d:
-                    err_plus = [float(x) for x in list(err_plus_super_d) + [0] + list(err_plus_sub_d)]
-                    err_minus = [float(x) for x in list(err_minus_super_d) + [0] + list(err_minus_sub_d)]
-                    bar_kw_d["error_x"] = dict(
-                        type="data",
-                        array=err_plus,
-                        arrayminus=err_minus,
-                        thickness=1.5,
-                        color="rgba(0,0,0,0.5)",
-                    )
-                fig_bars_d = go.Figure(go.Bar(**bar_kw_d))
-                shapes_d = _bar_chart_zone_shapes() + [
-                    dict(type="line", x0=0, x1=105, xref="x", y0=5, y1=5, yref="y", line=dict(color="rgba(0,0,0,0.35)", width=1.5)),
-                ]
-                for i in [8.5, 11.5, 14.5, 17.5]:
-                    shapes_d.append(dict(type="line", x0=0, x1=105, xref="x", y0=i, y1=i, yref="y", line=dict(color="rgba(0,0,0,0.18)", width=1, dash="dot")))
-                fig_bars_d.update_layout(
-                    title="Current context — super and sub-dimensions (0–100)",
-                    xaxis=dict(title="Score (0–100)", range=[0, 112], dtick=25),
-                    yaxis=dict(autorange="reversed", tickfont=dict(size=10)),
-                    height=580,
-                    margin=dict(t=64, b=44, l=20),
-                    template="plotly_white",
-                    showlegend=False,
-                    shapes=shapes_d,
-                    annotations=[
-                        dict(x=20, y=1.02, xref="x", yref="paper", text="Needs attention", showarrow=False,
-                             font=dict(size=10, color="rgba(160, 80, 80, 0.9)")),
-                        dict(x=50, y=1.02, xref="x", yref="paper", text="Neutral", showarrow=False,
-                             font=dict(size=10, color="rgba(140, 120, 50, 0.9)")),
-                        dict(x=80, y=1.02, xref="x", yref="paper", text="Good", showarrow=False,
-                             font=dict(size=10, color="rgba(60, 120, 60, 0.9)")),
-                    ],
-                )
-                st.plotly_chart(fig_bars_d, use_container_width=True)
+            fig_bars_d = go.Figure(go.Bar(**bar_kw_d))
+            shapes_d = _bar_chart_zone_shapes() + [
+                dict(type="line", x0=0, x1=105, xref="x", y0=5, y1=5, yref="y", line=dict(color="rgba(0,0,0,0.35)", width=1.5)),
+            ]
+            for i in [8.5, 11.5, 14.5, 17.5]:
+                shapes_d.append(dict(type="line", x0=0, x1=105, xref="x", y0=i, y1=i, yref="y", line=dict(color="rgba(0,0,0,0.18)", width=1, dash="dot")))
+            fig_bars_d.update_layout(
+                title="Current context — super and sub-dimensions (0–100)",
+                xaxis=dict(title="Score (0–100)", range=[0, 112], dtick=25),
+                yaxis=dict(autorange="reversed", tickfont=dict(size=10)),
+                height=580,
+                margin=dict(t=64, b=44, l=20),
+                template="plotly_white",
+                showlegend=False,
+                shapes=shapes_d,
+                annotations=[
+                    dict(x=20, y=1.02, xref="x", yref="paper", text="Needs attention", showarrow=False,
+                         font=dict(size=10, color="rgba(160, 80, 80, 0.9)")),
+                    dict(x=50, y=1.02, xref="x", yref="paper", text="Neutral", showarrow=False,
+                         font=dict(size=10, color="rgba(140, 120, 50, 0.9)")),
+                    dict(x=80, y=1.02, xref="x", yref="paper", text="Good", showarrow=False,
+                         font=dict(size=10, color="rgba(60, 120, 60, 0.9)")),
+                ],
+            )
+            st.plotly_chart(fig_bars_d, use_container_width=True)
+
+        # Compare children: Forest plot or Spider chart (tabs)
+        st.subheader("Compare children")
+        tab_forest_drill, tab_spider_drill = st.tabs(["Forest plot", "Spider chart"])
+        with tab_forest_drill:
+            # Same dimension setup as "How divisions compare": single vs grouped, pick dimension(s)
+            dim_options_ov = [(f"{short_labels[k]} (super)", "super", k) for k in range(5)]
+            dim_options_ov += [(sub_names_15[j], "sub", j) for j in range(15)]
+            dim_labels_ov = [d[0] for d in dim_options_ov]
+            view_dims_ov = st.radio("Show", ["Single dimension", "Multiple dimensions (grouped)"], horizontal=True, key="overview_drill_dim_mode")
+            if view_dims_ov.startswith("Single"):
+                sel_dim_ov = st.selectbox("Dimension", range(len(dim_labels_ov)), format_func=lambda i: dim_labels_ov[i], key="overview_drill_single_dim")
+                selected_dims_ov = [dim_options_ov[sel_dim_ov]]
             else:
-                show_cri_spider_d = st.checkbox("Show 95% credibility intervals on spiders", value=False, key="overview_drill_show_cri_spider")
-                n_super_d, n_sub_d = 5, 15
-                angles_super_d = np.linspace(0, 360, n_super_d, endpoint=False)
-                angles_sub_d = np.linspace(0, 360, n_sub_d, endpoint=False)
+                sel_multi_ov = st.multiselect("Dimensions to include", options=range(len(dim_labels_ov)), format_func=lambda i: dim_labels_ov[i], default=[0], key="overview_drill_multi_dim")
+                selected_dims_ov = [dim_options_ov[i] for i in sel_multi_ov] if sel_multi_ov else [dim_options_ov[0]]
 
-                def _wedge_traces_d(means, angles_deg, colors, descriptions=None):
-                    traces = []
-                    n = len(means)
-                    for k in range(n):
-                        th0, th1 = angles_deg[k], angles_deg[(k + 1) % n]
-                        r_wedge = [0, float(means[k]), 0]
-                        theta_wedge = [th0, th0, th1]
-                        color = colors[k % len(colors)]
-                        desc = (descriptions[k] if descriptions and k < len(descriptions) else "") or ""
-                        tr = go.Scatterpolar(
-                            r=r_wedge, theta=theta_wedge, fill="toself", fillcolor=color,
-                            line=dict(color=color, width=1.5), name=str(k), showlegend=False,
-                        )
-                        if desc:
-                            tr.update(customdata=[[desc, desc, desc]], hovertemplate="Score: %{r:.1f}<br><br>%{customdata[0]}<extra></extra>")
-                        traces.append(tr)
-                    return traces
+            def _ref_mean_sd_ov(kind, idx):
+                if cur_m_ov is None or cur_s_ov is None:
+                    return None, None
+                m, s = np.asarray(cur_m_ov), np.asarray(cur_s_ov)
+                if kind == "super":
+                    ms, ss = sub_to_super_means_sds(m, s)
+                    return float(ms[idx]), float(ss[idx])
+                return float(m[idx]), float(s[idx])
 
-                col_spider_super_d, col_spider_sub_d = st.columns(2)
-                fig_super_spider_d = go.Figure()
-                r_neutral_d = [50] * (n_super_d + 1)
-                theta_neutral_d = list(angles_super_d) + [angles_super_d[0]]
-                fig_super_spider_d.add_trace(go.Scatterpolar(
-                    r=r_neutral_d, theta=theta_neutral_d, fill="toself",
-                    fillcolor="rgba(200, 200, 200, 0.12)",
-                    line=dict(color="rgba(120,120,120,0.5)", dash="dot", width=1), name="Neutral (50)",
-                ))
-                if show_cri_spider_d:
-                    r_lo_d = list(lo_super_d) + [lo_super_d[0]]
-                    r_hi_d = list(hi_super_d) + [hi_super_d[0]]
-                    fig_super_spider_d.add_trace(go.Scatterpolar(r=r_lo_d, theta=theta_neutral_d, fill="none", line=dict(color="rgba(0,0,0,0.2)", width=0.5), showlegend=False))
-                    fig_super_spider_d.add_trace(go.Scatterpolar(r=r_hi_d, theta=theta_neutral_d, fill="tonext", fillcolor="rgba(100, 140, 140, 0.2)", line=dict(color="rgba(80, 120, 120, 0.4)", width=0.5), name="95% CrI"))
-                super_descriptions_d = [get_super_description(k) for k in range(5)]
-                for tr in _wedge_traces_d(mean_super_d, angles_super_d, domain_colors, super_descriptions_d):
-                    fig_super_spider_d.add_trace(tr)
-                fig_super_spider_d.update_layout(
-                    polar=dict(
-                        radialaxis=dict(visible=True, range=[0, 100], tickfont=dict(size=10)),
-                        angularaxis=dict(tickvals=list(angles_super_d + 360 / n_super_d / 2), ticktext=short_labels, tickfont=dict(size=11)),
-                    ),
-                    showlegend=True, legend=dict(orientation="h", yanchor="bottom", y=1.02),
-                    margin=dict(t=56, b=48, l=48, r=48), height=400, template="plotly_white",
-                    paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-                )
-                for k in range(5):
-                    icon_path = ICONS_DIR / f"{SUPERFACTOR_ICON_KEYS[k]}.png"
-                    if icon_path.exists():
-                        with open(icon_path, "rb") as f:
-                            b64 = base64.b64encode(f.read()).decode()
-                        source = f"data:image/png;base64,{b64}"
-                        angle_rad = np.deg2rad(angles_super_d[k] + 360 / n_super_d / 2)
-                        x, y = 0.5 + 0.42 * np.cos(angle_rad), 0.5 + 0.42 * np.sin(angle_rad)
-                        fig_super_spider_d.add_layout_image(dict(source=source, xref="paper", yref="paper", x=x, y=y, sizex=0.14, sizey=0.14, xanchor="center", yanchor="middle", layer="above"))
-                with col_spider_super_d:
-                    st.caption("**5 super-dimensions**")
-                    st.plotly_chart(fig_super_spider_d, use_container_width=True)
-                sub_colors_spider_d = [domain_colors[i // 3] for i in range(15)]
-                fig_sub_spider_d = go.Figure()
-                r_neutral_sub_d = [50] * (n_sub_d + 1)
-                theta_neutral_sub_d = list(angles_sub_d) + [angles_sub_d[0]]
-                fig_sub_spider_d.add_trace(go.Scatterpolar(
-                    r=r_neutral_sub_d, theta=theta_neutral_sub_d, fill="toself",
-                    fillcolor="rgba(200, 200, 200, 0.08)",
-                    line=dict(color="rgba(120,120,120,0.4)", dash="dot", width=0.5), name="Neutral (50)",
-                ))
-                if show_cri_spider_d:
-                    r_lo_sub_d = list(lo_sub_d) + [lo_sub_d[0]]
-                    r_hi_sub_d = list(hi_sub_d) + [hi_sub_d[0]]
-                    fig_sub_spider_d.add_trace(go.Scatterpolar(r=r_lo_sub_d, theta=theta_neutral_sub_d, fill="none", line=dict(color="rgba(0,0,0,0.15)", width=0.5), showlegend=False))
-                    fig_sub_spider_d.add_trace(go.Scatterpolar(r=r_hi_sub_d, theta=theta_neutral_sub_d, fill="tonext", fillcolor="rgba(100, 120, 120, 0.15)", line=dict(color="rgba(80, 100, 100, 0.3)", width=0.5), name="95% CrI"))
-                sub_descriptions_d = [get_sub_description(j) for j in range(15)]
-                for tr in _wedge_traces_d(mean_sub_d, angles_sub_d, sub_colors_spider_d, sub_descriptions_d):
-                    fig_sub_spider_d.add_trace(tr)
-                fig_sub_spider_d.update_layout(
-                    polar=dict(
-                        radialaxis=dict(visible=True, range=[0, 100], tickfont=dict(size=9)),
-                        angularaxis=dict(tickvals=list(angles_sub_d + 360 / n_sub_d / 2), ticktext=sub_names_15, tickfont=dict(size=9)),
-                    ),
-                    showlegend=True, legend=dict(orientation="h", yanchor="bottom", y=1.02),
-                    margin=dict(t=80, b=80, l=60, r=60), height=520, template="plotly_white",
-                    paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-                )
-                with col_spider_sub_d:
-                    st.caption("**15 sub-dimensions**")
-                    st.plotly_chart(fig_sub_spider_d, use_container_width=True)
+            def _child_mean_sd_ov(m15, s15, kind, idx):
+                if m15 is None or s15 is None:
+                    return 50.0, 10.0
+                m, s = np.asarray(m15), np.asarray(s15)
+                if kind == "super":
+                    ms, ss = sub_to_super_means_sds(m, s)
+                    return float(ms[idx]), float(ss[idx])
+                return float(m[idx]), float(s[idx])
 
-        # Forest plots: same dimension setup as "How divisions compare"
-        st.subheader("Forest plot — compare children")
-        # Same dimension setup as "How divisions compare": single vs grouped, pick dimension(s)
-        dim_options_ov = [(f"{short_labels[k]} (super)", "super", k) for k in range(5)]
-        dim_options_ov += [(sub_names_15[j], "sub", j) for j in range(15)]
-        dim_labels_ov = [d[0] for d in dim_options_ov]
-        view_dims_ov = st.radio("Show", ["Single dimension", "Multiple dimensions (grouped)"], horizontal=True, key="overview_drill_dim_mode")
-        if view_dims_ov.startswith("Single"):
-            sel_dim_ov = st.selectbox("Dimension", range(len(dim_labels_ov)), format_func=lambda i: dim_labels_ov[i], key="overview_drill_single_dim")
-            selected_dims_ov = [dim_options_ov[sel_dim_ov]]
-        else:
-            sel_multi_ov = st.multiselect("Dimensions to include", options=range(len(dim_labels_ov)), format_func=lambda i: dim_labels_ov[i], default=[0], key="overview_drill_multi_dim")
-            selected_dims_ov = [dim_options_ov[i] for i in sel_multi_ov] if sel_multi_ov else [dim_options_ov[0]]
+            children_ov_valid = [(cid, m15, s15) for cid, m15, s15 in children_ov if m15 is not None and s15 is not None]
+            child_names_ov = [_name_drill(cid) for cid, _, _ in children_ov_valid]
+            n_c = len(child_names_ov)
+            y_numeric_c = list(range(n_c)) if n_c else []
+            ref_available = selected_dims_ov and _ref_mean_sd_ov(selected_dims_ov[0][1], selected_dims_ov[0][2])[0] is not None
 
-        def _ref_mean_sd_ov(kind, idx):
-            if cur_m_ov is None or cur_s_ov is None:
-                return None, None
-            m, s = np.asarray(cur_m_ov), np.asarray(cur_s_ov)
-            if kind == "super":
-                ms, ss = sub_to_super_means_sds(m, s)
-                return float(ms[idx]), float(ss[idx])
-            return float(m[idx]), float(s[idx])
-
-        def _child_mean_sd_ov(m15, s15, kind, idx):
-            if m15 is None or s15 is None:
-                return 50.0, 10.0
-            m, s = np.asarray(m15), np.asarray(s15)
-            if kind == "super":
-                ms, ss = sub_to_super_means_sds(m, s)
-                return float(ms[idx]), float(ss[idx])
-            return float(m[idx]), float(s[idx])
-
-        children_ov_valid = [(cid, m15, s15) for cid, m15, s15 in children_ov if m15 is not None and s15 is not None]
-        child_names_ov = [_name_drill(cid) for cid, _, _ in children_ov_valid]
-        n_c = len(child_names_ov)
-        y_numeric_c = list(range(n_c)) if n_c else []
-        ref_available = selected_dims_ov and _ref_mean_sd_ov(selected_dims_ov[0][1], selected_dims_ov[0][2])[0] is not None
-
-        if n_c > 0 or ref_available:
-            if len(selected_dims_ov) == 1:
-                label_ov, kind_ov, idx_ov = selected_dims_ov[0]
-                ref_m, ref_s = _ref_mean_sd_ov(kind_ov, idx_ov)
-                means_c = [_child_mean_sd_ov(m15, s15, kind_ov, idx_ov)[0] for _, m15, s15 in children_ov_valid]
-                los_c = [np.clip(_child_mean_sd_ov(m15, s15, kind_ov, idx_ov)[0] - cri_scale_ov * _child_mean_sd_ov(m15, s15, kind_ov, idx_ov)[1], 0, 100) for _, m15, s15 in children_ov_valid]
-                his_c = [np.clip(_child_mean_sd_ov(m15, s15, kind_ov, idx_ov)[0] + cri_scale_ov * _child_mean_sd_ov(m15, s15, kind_ov, idx_ov)[1], 0, 100) for _, m15, s15 in children_ov_valid]
-                err_plus_c = [his_c[i] - means_c[i] for i in range(n_c)]
-                err_minus_c = [means_c[i] - los_c[i] for i in range(n_c)]
-                show_cri = n_c > 0 and (max(err_plus_c) > 0 or max(err_minus_c) > 0)
-                st.subheader("Forest plot — " + label_ov)
-                scatter_kw = dict(
-                    x=means_c,
-                    y=y_numeric_c,
-                    mode="markers",
-                    marker=dict(size=10, color="steelblue", symbol="diamond"),
-                    text=child_names_ov,
-                    hovertemplate="%{text}: %{x:.1f}" + (" (95%% CrI)" if show_cri else "") + "<extra></extra>",
-                )
-                if show_cri:
-                    scatter_kw["error_x"] = dict(type="data", array=err_plus_c, arrayminus=err_minus_c, thickness=1.5, color="steelblue")
-                fig_drill = go.Figure(go.Scatter(**scatter_kw))
-                if ref_m is not None:
-                    fig_drill.add_vline(x=ref_m, line_dash="dot", line_color="gray", line_width=1.5, annotation_text="Current level mean")
-                fig_drill.update_layout(
-                    title=f"Forest plot — {label_ov}",
-                    xaxis=dict(title="Score (0–100)", range=[0, 105]),
-                    yaxis=dict(tickmode="array", tickvals=y_numeric_c, ticktext=child_names_ov, autorange="reversed", tickfont=dict(size=11)),
-                    height=max(420, 72 * max(n_c, 1)),
-                    margin=dict(l=220),
-                    template="plotly_white",
-                    showlegend=False,
-                )
-                st.plotly_chart(fig_drill, use_container_width=True)
-            else:
-                # Grouped: same band + gap as overview
-                n_dims_ov = len(selected_dims_ov)
-                group_band_ov = 0.28
-                gap_ov = 0.72
-                y_per_row_ov = group_band_ov + gap_ov
-                ref_label_ov, ref_kind_ov, ref_idx_ov = selected_dims_ov[0]
-                ref_m_gr, _ = _ref_mean_sd_ov(ref_kind_ov, ref_idx_ov)
-                st.subheader("Forest plot — grouped by dimension")
-                fig_drill = go.Figure()
-                for i, (label_ov, kind_ov, idx_ov) in enumerate(selected_dims_ov):
+            if n_c > 0 or ref_available:
+                if len(selected_dims_ov) == 1:
+                    label_ov, kind_ov, idx_ov = selected_dims_ov[0]
+                    ref_m, ref_s = _ref_mean_sd_ov(kind_ov, idx_ov)
                     means_c = [_child_mean_sd_ov(m15, s15, kind_ov, idx_ov)[0] for _, m15, s15 in children_ov_valid]
                     los_c = [np.clip(_child_mean_sd_ov(m15, s15, kind_ov, idx_ov)[0] - cri_scale_ov * _child_mean_sd_ov(m15, s15, kind_ov, idx_ov)[1], 0, 100) for _, m15, s15 in children_ov_valid]
                     his_c = [np.clip(_child_mean_sd_ov(m15, s15, kind_ov, idx_ov)[0] + cri_scale_ov * _child_mean_sd_ov(m15, s15, kind_ov, idx_ov)[1], 0, 100) for _, m15, s15 in children_ov_valid]
-                    err_plus_c = [his_c[j] - means_c[j] for j in range(n_c)]
-                    err_minus_c = [means_c[j] - los_c[j] for j in range(n_c)]
-                    show_cri_gr = n_c > 0 and (max(err_plus_c) > 0 or max(err_minus_c) > 0)
-                    color_ov = domain_colors[idx_ov // 3] if kind_ov == "sub" else domain_colors[idx_ov]
-                    div_step_ov = (group_band_ov / max(n_dims_ov - 1, 1)) * i
-                    y_grouped_c = [r * y_per_row_ov + div_step_ov for r in range(n_c)]
-                    trace_kw = dict(
+                    err_plus_c = [his_c[i] - means_c[i] for i in range(n_c)]
+                    err_minus_c = [means_c[i] - los_c[i] for i in range(n_c)]
+                    show_cri = n_c > 0 and (max(err_plus_c) > 0 or max(err_minus_c) > 0)
+                    st.subheader("Forest plot — " + label_ov)
+                    scatter_kw = dict(
                         x=means_c,
-                        y=y_grouped_c,
+                        y=y_numeric_c,
                         mode="markers",
-                        marker=dict(size=8, color=color_ov, symbol="circle"),
-                        name=label_ov,
-                        hovertemplate="%{text}: %{x:.1f} — " + label_ov + "<extra></extra>",
+                        marker=dict(size=10, color="steelblue", symbol="diamond"),
                         text=child_names_ov,
+                        hovertemplate="%{text}: %{x:.1f}" + (" (95%% CrI)" if show_cri else "") + "<extra></extra>",
                     )
-                    if show_cri_gr:
-                        trace_kw["error_x"] = dict(type="data", array=err_plus_c, arrayminus=err_minus_c, thickness=1.2, color=color_ov)
-                    fig_drill.add_trace(go.Scatter(**trace_kw))
-                tickvals_gr_ov = [r * y_per_row_ov + group_band_ov / 2 for r in range(n_c)]
-                if ref_m_gr is not None:
-                    fig_drill.add_vline(x=ref_m_gr, line_dash="dot", line_color="gray", line_width=1.5, annotation_text="Current level mean")
-                fig_drill.update_layout(
-                    title="Forest plot — grouped by dimension",
-                    xaxis=dict(title="Score (0–100)", range=[0, 105]),
-                    yaxis=dict(tickmode="array", tickvals=tickvals_gr_ov, ticktext=child_names_ov, autorange="reversed", tickfont=dict(size=11)),
-                    height=max(420, 72 * max(n_c, 1)),
-                    margin=dict(l=220),
-                    template="plotly_white",
-                    showlegend=True,
-                    legend=dict(orientation="h", yanchor="bottom", y=1.02),
-                )
-                st.plotly_chart(fig_drill, use_container_width=True)
+                    if show_cri:
+                        scatter_kw["error_x"] = dict(type="data", array=err_plus_c, arrayminus=err_minus_c, thickness=1.5, color="steelblue")
+                    fig_drill = go.Figure(go.Scatter(**scatter_kw))
+                    if ref_m is not None:
+                        fig_drill.add_vline(x=ref_m, line_dash="dot", line_color="gray", line_width=1.5, annotation_text="Current level mean")
+                    fig_drill.update_layout(
+                        title=f"Forest plot — {label_ov}",
+                        xaxis=dict(title="Score (0–100)", range=[0, 105]),
+                        yaxis=dict(tickmode="array", tickvals=y_numeric_c, ticktext=child_names_ov, autorange="reversed", tickfont=dict(size=11)),
+                        height=max(420, 72 * max(n_c, 1)),
+                        margin=dict(l=220),
+                        template="plotly_white",
+                        showlegend=False,
+                    )
+                    st.plotly_chart(fig_drill, use_container_width=True)
+                else:
+                    # Grouped: same band + gap as overview
+                    n_dims_ov = len(selected_dims_ov)
+                    group_band_ov = 0.28
+                    gap_ov = 0.72
+                    y_per_row_ov = group_band_ov + gap_ov
+                    ref_label_ov, ref_kind_ov, ref_idx_ov = selected_dims_ov[0]
+                    ref_m_gr, _ = _ref_mean_sd_ov(ref_kind_ov, ref_idx_ov)
+                    st.subheader("Forest plot — grouped by dimension")
+                    fig_drill = go.Figure()
+                    for i, (label_ov, kind_ov, idx_ov) in enumerate(selected_dims_ov):
+                        means_c = [_child_mean_sd_ov(m15, s15, kind_ov, idx_ov)[0] for _, m15, s15 in children_ov_valid]
+                        los_c = [np.clip(_child_mean_sd_ov(m15, s15, kind_ov, idx_ov)[0] - cri_scale_ov * _child_mean_sd_ov(m15, s15, kind_ov, idx_ov)[1], 0, 100) for _, m15, s15 in children_ov_valid]
+                        his_c = [np.clip(_child_mean_sd_ov(m15, s15, kind_ov, idx_ov)[0] + cri_scale_ov * _child_mean_sd_ov(m15, s15, kind_ov, idx_ov)[1], 0, 100) for _, m15, s15 in children_ov_valid]
+                        err_plus_c = [his_c[j] - means_c[j] for j in range(n_c)]
+                        err_minus_c = [means_c[j] - los_c[j] for j in range(n_c)]
+                        show_cri_gr = n_c > 0 and (max(err_plus_c) > 0 or max(err_minus_c) > 0)
+                        color_ov = domain_colors[idx_ov // 3] if kind_ov == "sub" else domain_colors[idx_ov]
+                        div_step_ov = (group_band_ov / max(n_dims_ov - 1, 1)) * i
+                        y_grouped_c = [r * y_per_row_ov + div_step_ov for r in range(n_c)]
+                        trace_kw = dict(
+                            x=means_c,
+                            y=y_grouped_c,
+                            mode="markers",
+                            marker=dict(size=8, color=color_ov, symbol="circle"),
+                            name=label_ov,
+                            hovertemplate="%{text}: %{x:.1f} — " + label_ov + "<extra></extra>",
+                            text=child_names_ov,
+                        )
+                        if show_cri_gr:
+                            trace_kw["error_x"] = dict(type="data", array=err_plus_c, arrayminus=err_minus_c, thickness=1.2, color=color_ov)
+                        fig_drill.add_trace(go.Scatter(**trace_kw))
+                    tickvals_gr_ov = [r * y_per_row_ov + group_band_ov / 2 for r in range(n_c)]
+                    if ref_m_gr is not None:
+                        fig_drill.add_vline(x=ref_m_gr, line_dash="dot", line_color="gray", line_width=1.5, annotation_text="Current level mean")
+                    fig_drill.update_layout(
+                        title="Forest plot — grouped by dimension",
+                        xaxis=dict(title="Score (0–100)", range=[0, 105]),
+                        yaxis=dict(tickmode="array", tickvals=tickvals_gr_ov, ticktext=child_names_ov, autorange="reversed", tickfont=dict(size=11)),
+                        height=max(420, 72 * max(n_c, 1)),
+                        margin=dict(l=220),
+                        template="plotly_white",
+                        showlegend=True,
+                        legend=dict(orientation="h", yanchor="bottom", y=1.02),
+                    )
+                    st.plotly_chart(fig_drill, use_container_width=True)
             st.caption("Current level mean as dotted reference. 95% credibility intervals shown.")
+
+        with tab_spider_drill:
+            # Spider chart: compare children (same entities as forest plot) — one contour per child
+            children_spider = [(cid, m15, s15) for cid, m15, s15 in children_ov if m15 is not None and s15 is not None]
+            child_names_spider = [_name_drill(cid) for cid, _, _ in children_spider]
+            n_c_spider = len(children_spider)
+            # Distinct colors for up to 12 entities, then cycle
+            _spider_compare_colors = [
+                "#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b",
+                "#e377c2", "#7f7f7f", "#bcbd22", "#17becf", "#2d7d7d", "#7d4a2d",
+            ]
+            n_super_d, n_sub_d = 5, 15
+            angles_super_d = np.linspace(0, 360, n_super_d, endpoint=False)
+            angles_sub_d = np.linspace(0, 360, n_sub_d, endpoint=False)
+            super_descriptions_d = [get_super_description(k) for k in range(5)]
+            sub_descriptions_d = [get_sub_description(j) for j in range(15)]
+
+            def _contour_trace_d(r_values, theta_deg, line_color, name, descriptions=None):
+                """One closed polygon contour, lines only (no fill)."""
+                r = list(r_values) + [float(r_values[0])]
+                theta = list(theta_deg) + [theta_deg[0]]
+                tr = go.Scatterpolar(
+                    r=r, theta=theta, fill="none",
+                    line=dict(color=line_color, width=2), name=name,
+                )
+                if descriptions is not None:
+                    customdata = [descriptions[k % len(descriptions)] for k in range(len(r_values))] + [descriptions[0]]
+                    tr.update(customdata=customdata, hovertemplate="Score: %{r:.1f}<br><br>%{customdata}<extra></extra>")
+                return tr
+
+            col_spider_super_d, col_spider_sub_d = st.columns(2)
+            fig_super_spider_d = go.Figure()
+            r_neutral_d = [50] * (n_super_d + 1)
+            theta_neutral_d = list(angles_super_d) + [angles_super_d[0]]
+            fig_super_spider_d.add_trace(go.Scatterpolar(
+                r=r_neutral_d, theta=theta_neutral_d, fill="none",
+                line=dict(color="rgba(120,120,120,0.5)", dash="dot", width=1), name="Neutral (50)",
+            ))
+            # Current level as reference (dashed) when we have children to compare
+            if cur_m_ov is not None and cur_s_ov is not None and n_c_spider > 0:
+                _ms, _ = sub_to_super_means_sds(np.asarray(cur_m_ov), np.asarray(cur_s_ov))
+                _ms = np.clip(_ms, 0, 100)
+                r_ref = list(_ms) + [float(_ms[0])]
+                theta_ref = list(angles_super_d) + [angles_super_d[0]]
+                custom_ref = [super_descriptions_d[k % 5] for k in range(5)] + [super_descriptions_d[0]]
+                fig_super_spider_d.add_trace(go.Scatterpolar(
+                    r=r_ref, theta=theta_ref, fill="none",
+                    line=dict(color="rgba(80,80,80,0.9)", width=1.5, dash="dash"),
+                    name="Current level (ref)", customdata=custom_ref,
+                    hovertemplate="Score: %{r:.1f}<br><br>%{customdata}<extra></extra>",
+                ))
+            # One contour per child
+            for i, (cid, m15, s15) in enumerate(children_spider):
+                m_sub = np.clip(np.asarray(m15), 0, 100)
+                m_sup, _ = sub_to_super_means_sds(m_sub, np.asarray(s15))
+                m_sup = np.clip(m_sup, 0, 100)
+                color = _spider_compare_colors[i % len(_spider_compare_colors)]
+                fig_super_spider_d.add_trace(_contour_trace_d(
+                    m_sup, angles_super_d,
+                    line_color=color,
+                    name=child_names_spider[i], descriptions=super_descriptions_d,
+                ))
+            fig_super_spider_d.update_layout(
+                polar=dict(
+                    radialaxis=dict(visible=True, range=[0, 100], tickfont=dict(size=10)),
+                    angularaxis=dict(tickvals=list(angles_super_d + 360 / n_super_d / 2), ticktext=short_labels, tickfont=dict(size=11)),
+                ),
+                showlegend=True, legend=dict(orientation="h", yanchor="bottom", y=1.02),
+                margin=dict(t=56, b=48, l=48, r=48), height=400, template="plotly_white",
+                paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+            )
+            for k in range(5):
+                icon_path = ICONS_DIR / f"{SUPERFACTOR_ICON_KEYS[k]}.png"
+                if icon_path.exists():
+                    with open(icon_path, "rb") as f:
+                        b64 = base64.b64encode(f.read()).decode()
+                    source = f"data:image/png;base64,{b64}"
+                    angle_rad = np.deg2rad(angles_super_d[k] + 360 / n_super_d / 2)
+                    x, y = 0.5 + 0.42 * np.cos(angle_rad), 0.5 + 0.42 * np.sin(angle_rad)
+                    fig_super_spider_d.add_layout_image(dict(source=source, xref="paper", yref="paper", x=x, y=y, sizex=0.14, sizey=0.14, xanchor="center", yanchor="middle", layer="above"))
+            with col_spider_super_d:
+                st.caption("**5 super-dimensions — compare subdivisions**")
+                st.plotly_chart(fig_super_spider_d, use_container_width=True)
+            fig_sub_spider_d = go.Figure()
+            r_neutral_sub_d = [50] * (n_sub_d + 1)
+            theta_neutral_sub_d = list(angles_sub_d) + [angles_sub_d[0]]
+            fig_sub_spider_d.add_trace(go.Scatterpolar(
+                r=r_neutral_sub_d, theta=theta_neutral_sub_d, fill="none",
+                line=dict(color="rgba(120,120,120,0.4)", dash="dot", width=0.5), name="Neutral (50)",
+            ))
+            if cur_m_ov is not None and cur_s_ov is not None and n_c_spider > 0:
+                _m_sub_ref = np.clip(np.asarray(cur_m_ov), 0, 100)
+                r_ref_sub = list(_m_sub_ref) + [float(_m_sub_ref[0])]
+                theta_ref_sub = list(angles_sub_d) + [angles_sub_d[0]]
+                custom_ref_sub = [sub_descriptions_d[k % 15] for k in range(15)] + [sub_descriptions_d[0]]
+                fig_sub_spider_d.add_trace(go.Scatterpolar(
+                    r=r_ref_sub, theta=theta_ref_sub, fill="none",
+                    line=dict(color="rgba(80,80,80,0.9)", width=1.5, dash="dash"),
+                    name="Current level (ref)", customdata=custom_ref_sub,
+                    hovertemplate="Score: %{r:.1f}<br><br>%{customdata}<extra></extra>",
+                ))
+            for i, (cid, m15, s15) in enumerate(children_spider):
+                m_sub = np.clip(np.asarray(m15), 0, 100)
+                color = _spider_compare_colors[i % len(_spider_compare_colors)]
+                fig_sub_spider_d.add_trace(_contour_trace_d(
+                    m_sub, angles_sub_d,
+                    line_color=color,
+                    name=child_names_spider[i], descriptions=sub_descriptions_d,
+                ))
+            fig_sub_spider_d.update_layout(
+                polar=dict(
+                    radialaxis=dict(visible=True, range=[0, 100], tickfont=dict(size=9)),
+                    angularaxis=dict(tickvals=list(angles_sub_d + 360 / n_sub_d / 2), ticktext=sub_names_15, tickfont=dict(size=9)),
+                ),
+                showlegend=True, legend=dict(orientation="h", yanchor="bottom", y=1.02),
+                margin=dict(t=80, b=80, l=60, r=60), height=520, template="plotly_white",
+                paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+            )
+            with col_spider_sub_d:
+                st.caption("**15 sub-dimensions — compare subdivisions**")
+                st.plotly_chart(fig_sub_spider_d, use_container_width=True)
+            if n_c_spider == 0:
+                st.caption("No child units at this level. Select a division or department to compare its subdivisions.")
 
         # Team level: compact profile (forest plot above already shows individuals as rows)
         if level_ov == "Team" and sel_team_ov and cur_m_ov is not None and cur_s_ov is not None:
