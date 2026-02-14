@@ -2,6 +2,8 @@
 
 Read-only Streamlit app that displays precomputed culture results (5 super- and 15 sub-dimensions, 0–100 scale) with drill-down by org → division → department → team.
 
+**For colleagues:** The full product and data spec (what the dashboard is, what each chart does, explainability text, glossary, data contract) is in **[DASHBOARD_SPEC.md](DASHBOARD_SPEC.md)**.
+
 ## Run locally
 
 ```bash
