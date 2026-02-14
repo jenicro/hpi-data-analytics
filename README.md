@@ -22,3 +22,7 @@ streamlit run app_dashboard.py
 ```
 
 Which dataset is loaded is set in **`dashboard_input/dashboard_config.json`** (`culture_results_sample.json` or `culture_results.json`).
+
+---
+
+**License / use:** See [LICENSE](LICENSE). No part of this repository may be used for any purpose without permission.
