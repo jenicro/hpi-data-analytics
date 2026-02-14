@@ -46,9 +46,8 @@ htmlcov/
 # Hugging Face token (never commit)
 .git-credentials-huggingface
 
-# Binary PNGs (HF Spaces reject them; keep locally for icons and spec images)
+# Binary PNGs (HF Spaces may reject; keep icons local if needed)
 dashboard_input/icons/*.png
-docs/dashboard_spec_images/*.png
 
 # Optional: uncomment to avoid committing large/sensitive response data
 # dashboard_input/item_responses.csv
