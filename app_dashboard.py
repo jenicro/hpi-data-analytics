@@ -1,7 +1,8 @@
 """
 Organizational culture dashboard — view-only.
-Loads precomputed results from dashboard_input/culture_results.json (no on-the-fly statistics).
-To refresh results, run: python scripts/prepare_dashboard_data.py
+Loads precomputed results from dashboard_input. Which file is read from dashboard_input/dashboard_config.json
+(data_file: "culture_results.json" or "culture_results_sample.json"). If config is missing, uses
+culture_results.json if present else culture_results_sample.json.
 """
 import base64
 import json
@@ -95,10 +96,27 @@ def _cached_sunburst_fig_json(level_id, ids_tuple, labels_tuple, parents_tuple):
 
 # Path to the folder where precomputed results and assets live
 DASHBOARD_INPUT_DIR = Path(__file__).resolve().parent / "dashboard_input"
+DASHBOARD_CONFIG_PATH = DASHBOARD_INPUT_DIR / "dashboard_config.json"
 ORG_HIERARCHY_PATH = DASHBOARD_INPUT_DIR / "org_hierarchy.json"
 ITEM_BANK_PATH = DASHBOARD_INPUT_DIR / "item_bank.json"
 CULTURE_RESULTS_PATH = DASHBOARD_INPUT_DIR / "culture_results.json"
 CULTURE_RESULTS_SAMPLE_PATH = DASHBOARD_INPUT_DIR / "culture_results_sample.json"
+
+
+def _get_data_file_path():
+    """Which culture results file to load. From dashboard_config.json if present, else default."""
+    if DASHBOARD_CONFIG_PATH.exists():
+        try:
+            with open(DASHBOARD_CONFIG_PATH, encoding="utf-8") as f:
+                cfg = json.load(f)
+            name = cfg.get("data_file") or ""
+            if name == "culture_results_sample.json":
+                return CULTURE_RESULTS_SAMPLE_PATH if CULTURE_RESULTS_SAMPLE_PATH.exists() else None
+            if name == "culture_results.json":
+                return CULTURE_RESULTS_PATH if CULTURE_RESULTS_PATH.exists() else None
+        except Exception:
+            pass
+    return CULTURE_RESULTS_PATH if CULTURE_RESULTS_PATH.exists() else (CULTURE_RESULTS_SAMPLE_PATH if CULTURE_RESULTS_SAMPLE_PATH.exists() else None)
 
 st.set_page_config(page_title="Organizational Culture Dashboard", layout="wide", initial_sidebar_state="expanded")
 
@@ -140,9 +158,11 @@ item_bank, bank_err = load_item_bank()
 # Load precomputed culture results (no stats run in the app)
 # -----------------------------------------------------------------------------
 def load_precomputed_results():
-    """Load culture_results.json if present; fall back to culture_results_sample.json; set session state. Returns True if loaded."""
-    path = CULTURE_RESULTS_PATH if CULTURE_RESULTS_PATH.exists() else (CULTURE_RESULTS_SAMPLE_PATH if CULTURE_RESULTS_SAMPLE_PATH.exists() else None)
+    """Load the culture results file chosen by dashboard_config.json (or default). Sets session state. Returns True if loaded."""
+    path = _get_data_file_path()
     if path is None:
+        if "load_error" in st.session_state:
+            del st.session_state.load_error
         return False
     try:
         with open(path, encoding="utf-8") as f:
@@ -154,8 +174,12 @@ def load_precomputed_results():
         rs = data.get("respondent_scores") or {}
         st.session_state.respondent_scores = rs if rs.get("team_id") else None
         st.session_state.belief_updated = bool(st.session_state.hierarchical_result)
+        st.session_state.loaded_data_file = path.name  # which file was loaded (for display)
+        if "load_error" in st.session_state:
+            del st.session_state.load_error
         return True
-    except Exception:
+    except Exception as e:
+        st.session_state.load_error = str(e)
         return False
 
 if "hierarchical_result" not in st.session_state:
@@ -171,7 +195,13 @@ if "posterior_theta_sub" not in st.session_state:
 
 if "respondent_scores" not in st.session_state:
     st.session_state.respondent_scores = None
-if st.session_state.hierarchical_result is None and CULTURE_RESULTS_PATH.exists():
+if "loaded_data_file" not in st.session_state:
+    st.session_state.loaded_data_file = None
+if "load_error" not in st.session_state:
+    st.session_state.load_error = None
+
+# Load results (file chosen by dashboard_config.json or default)
+if st.session_state.hierarchical_result is None and _get_data_file_path() is not None:
     load_precomputed_results()
 
 # -----------------------------------------------------------------------------
@@ -192,11 +222,17 @@ with st.sidebar:
         st.warning(f"Bank: {bank_err}")
     else:
         st.success(f"**Item bank:** {len(item_bank)} items")
-    if CULTURE_RESULTS_PATH.exists():
-        st.success("**Precomputed:** culture_results.json")
-        st.caption("To refresh: run `python scripts/prepare_dashboard_data.py` then reload.")
+    if st.session_state.loaded_data_file:
+        st.success(f"**Data loaded:** {st.session_state.loaded_data_file}")
+        if st.session_state.loaded_data_file == "culture_results_sample.json":
+            st.caption("From config: **dashboard_input/dashboard_config.json** (sample). Edit `data_file` for full data.")
+        else:
+            st.caption("To refresh: run `python scripts/prepare_dashboard_data.py` then reload.")
+    elif CULTURE_RESULTS_PATH.exists() or CULTURE_RESULTS_SAMPLE_PATH.exists():
+        err = st.session_state.get("load_error")
+        st.warning("**Precomputed results** file present but failed to load." + (f" Error: {err}" if err else " Check format."))
     else:
-        st.warning("**Precomputed results not found.** Run: `python scripts/prepare_dashboard_data.py`")
+        st.warning("**Precomputed results not found.** Run: `python scripts/prepare_dashboard_data.py` or add **culture_results_sample.json**.")
     with st.expander("Dimension guide (click for explanation)"):
         st.caption("Click a dimension to read its description.")
         sub_idx = 0
