@@ -20,6 +20,11 @@ env/
 .eggs/
 dist/
 build/
+# Keep Streamlit custom component build for deployment
+!components/sunburst_select/frontend/build/
+
+# Node (Streamlit component frontend)
+node_modules/
 
 # Debug and logs
 *.log

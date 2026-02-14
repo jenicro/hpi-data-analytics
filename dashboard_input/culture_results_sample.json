@@ -1,0 +1,40 @@
+{
+  "summary_stats": {
+    "n_respondents": 100,
+    "n_teams": 10,
+    "n_departments": 3,
+    "n_divisions": 1
+  },
+  "hierarchical_result": {
+    "org": {
+      "mean_sub": [52, 55, 48, 58, 60, 54, 50, 53, 51, 49, 52, 56, 54, 50, 52],
+      "sd_sub": [8, 7, 9, 7, 6, 8, 8, 7, 8, 9, 7, 7, 8, 8, 7],
+      "mean_super": [51.67, 57.33, 51.33, 52.33, 52],
+      "sd_super": [6.2, 5.1, 6.0, 6.5, 6.2]
+    },
+    "division": {
+      "ids": ["div-1"],
+      "means": { "div-1": [52, 55, 48, 58, 60, 54, 50, 53, 51, 49, 52, 56, 54, 50, 52] },
+      "sds": { "div-1": [8, 7, 9, 7, 6, 8, 8, 7, 8, 9, 7, 7, 8, 8, 7] }
+    },
+    "department": {
+      "means": {},
+      "sds": {},
+      "dept_to_teams": {},
+      "dept_to_division": {}
+    },
+    "team": {
+      "means": {},
+      "sds": {},
+      "team_to_dept": {},
+      "team_to_division": {}
+    },
+    "division_to_depts": { "div-1": [] },
+    "by_id": {
+      "org": { "id": "org", "name": "Organization", "level": "org" },
+      "div-1": { "id": "div-1", "name": "Division 1", "level": "division", "parent_id": "org" }
+    }
+  },
+  "posterior_theta_org": [],
+  "posterior_theta_sub": []
+}
